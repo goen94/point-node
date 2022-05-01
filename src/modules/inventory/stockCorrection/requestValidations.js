@@ -28,6 +28,8 @@ const createFormRequest = {
     }),
     notes: Joi.string().default('').allow(null).max(255),
     requestApprovalTo: Joi.number().required(),
+    typeCorrection: Joi.string().required(),
+    qcPassed: Joi.number().required()
   }),
 };
 
