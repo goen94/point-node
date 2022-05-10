@@ -35,19 +35,19 @@ const createFormRequest = {
 
 const createFormReject = {
   body: Joi.object({
-    reason: Joi.string().allow(null).default(''),
+    reason: Joi.string().required(),
   }),
 };
 
 const deleteFormRequest = {
   body: Joi.object({
-    reason: Joi.string().allow(null).default(''),
+    reason: Joi.string().required(),
   }),
 };
 
 const deleteFormReject = {
   body: Joi.object({
-    reason: Joi.string().allow(null).allow('').default(''),
+    reason: Joi.string().required(),
   }),
 };
 
