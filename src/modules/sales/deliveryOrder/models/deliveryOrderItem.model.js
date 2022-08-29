@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes, projectCode) => {
       itemName: {
         type: DataTypes.STRING,
       },
-      quantity: {
+      quantity_delivered: {
         type: DataTypes.DECIMAL,
       },
       price: {
