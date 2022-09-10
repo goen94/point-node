@@ -66,6 +66,8 @@ describe('Stock Correction - Create Form Request', () => {
       }).call());
 
       expect(stockCorrection.warehouseId).toEqual(createFormRequestDto.warehouseId);
+      expect(stockCorrection.typeCorrection).toEqual(createFormRequestDto.typeCorrection);
+      expect(stockCorrection.qcPassed).toEqual(createFormRequestDto.qcPassed);
     });
 
     it('can create with expiry date and production number', async () => {

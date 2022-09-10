@@ -113,6 +113,18 @@ module.exports = (sequelize, DataTypes, projectCode) => {
       productionNumber: {
         type: DataTypes.STRING,
       },
+      quantityReturned: {
+        type: DataTypes.DECIMAL,
+        get() {
+          return parseFloat(this.getDataValue('quantityReturned'));
+        },
+      },
+      quantityRemaining: {
+        type: DataTypes.DECIMAL,
+        get() {
+          return parseFloat(this.getDataValue('quantityRemaining'));
+        },
+      },
     },
     {
       hooks: {},

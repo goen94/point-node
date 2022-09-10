@@ -24,7 +24,13 @@ class FindAll {
           as: 'items',
           include: [{ model: this.tenantDatabase.Allocation, as: 'allocation' }],
         },
+        {
+          model: this.tenantDatabase.SalesInvoiceItem,
+          as: 'items',
+          include: [{ model: this.tenantDatabase.Allocation, as: 'allocation' }],
+        },
         { model: this.tenantDatabase.Customer, as: 'customer' },
+        { model: this.tenantDatabase.DeliveryNote, as: 'salesDeliveryNote' },
       ],
       order: [['form', 'created_at', 'DESC']],
       limit: queryLimit,
