@@ -18,6 +18,7 @@ const modelPaths = [
   '/master/models/user.model.js',
   '/master/models/userWarehouse.model.js',
   '/master/models/warehouse.model.js',
+  '/master/models/supplier.model.js',
   // accounting
   '/accounting/models/journal.model.js',
   '/accounting/models/chartOfAccount.model.js',
@@ -103,7 +104,7 @@ async function addOrFindNewProjectDatabase (db, projectCode) {
 
 function generateConfigNewDatabase (projectCode) {
   const configDbTenant = config.databases.tenant;
-  const database = `point_${projectCode}`;
+  const database = `${process.env.DATABASE_NAME}_${projectCode}`;
   
   return {
     ...configDbTenant,

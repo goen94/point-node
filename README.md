@@ -80,7 +80,9 @@ ALTER TABLE `sales_invoice_items`
   ADD `referenceable_id` int(10) unsigned NOT NULL,
   ADD `referenceable_type` varchar(191) NOT NULL,
   ADD `item_referenceable_id` int(10) unsigned NOT NULL,
-  ADD `item_referenceable_type` varchar(191) NOT NULL;
+  ADD `item_referenceable_type` varchar(191) NOT NULL,
+  ADD `quantity_returned` decimal(65,30) default 0.000000000000000000000000000000 AFTER `quantity`,
+  ADD `quantity_remaining` decimal(65,30) default 0.000000000000000000000000000000 AFTER `quantity_returned`;
 ```
 
 &nbsp;
