@@ -392,6 +392,115 @@ describe('Payment Order - CreateFormRequest', () => {
 
       expect(journal.valid).toEqual(true);
     })
+
+    describe('check form reference still pending if amount less than available', () => {
+      let paymentOrder;
+      beforeEach(async (done) => {
+        ({ paymentOrder } = await new CreateFormRequest(tenantDatabase, {
+          maker,
+          createFormRequestDto,
+        }).call());
+
+        done();
+      });
+
+      it('check form invoice', async () => {
+        const form = await tenantDatabase.Form.findOne({
+          where: {
+            formableId: paymentOrder.invoices[0].id,
+            formableType: 'PurchaseInvoice',
+          }
+        })
+        expect(form.done).toEqual(0)
+      })
+
+      it('check form down payment', async () => {
+        const form = await tenantDatabase.Form.findOne({
+          where: {
+            formableId: paymentOrder.downPayments[0].id,
+            formableType: 'PurchaseDownPayment',
+          }
+        })
+        expect(form.done).toEqual(0)
+      })
+
+      it('check form return', async () => {
+        const form = await tenantDatabase.Form.findOne({
+          where: {
+            formableId: paymentOrder.returns[0].id,
+            formableType: 'PurchaseReturn',
+          }
+        })
+        expect(form.done).toEqual(0)
+      })
+    })
+
+    describe('check form reference done if amount same as available', () => {
+      let paymentOrder;
+      beforeAll(async () => {
+        paymentOrder = (await factory.paymentOrder.create({supplier}));
+        paymentOrderDetails =
+          (await factory.paymentOrderDetails.createDone({
+            paymentOrder,
+            purchaseInvoice,
+            purchaseDownPayment,
+            purchaseReturn,
+            chartOfAccountExpense,
+            chartOfAccountIncome,
+            allocation,
+          }));
+        formPaymentOrder =
+          (await factory.form.create({
+            branch,
+            reference: paymentOrder,
+            createdBy: maker.id,
+            updatedBy: maker.id,
+            requestApprovalTo: approver.id,
+            formable: paymentOrder,
+            formableType: 'PaymentOrder',
+            number: 'PAYORDER2211002',
+          }));
+        const recordFactories = await generateRecordFactories();
+        ({ paymentOrder, approver, formPaymentOrder} = recordFactories);
+
+        ({ paymentOrder } = await new CreateFormRequest(tenantDatabase, {
+          maker,
+          createFormRequestDto,
+        }).call());
+
+        done();
+      })
+
+      it('check form invoice', async () => {
+        const form = await tenantDatabase.Form.findOne({
+          where: {
+            formableId: paymentOrder.invoices[0].id,
+            formableType: 'PurchaseInvoice',
+          }
+        })
+        expect(form.done).toEqual(1)
+      })
+
+      it('check form down payment', async () => {
+        const form = await tenantDatabase.Form.findOne({
+          where: {
+            formableId: paymentOrder.downPayments[0].id,
+            formableType: 'PurchaseDownPayment',
+          }
+        })
+        expect(form.done).toEqual(1)
+      })
+
+      it('check form return', async () => {
+        const form = await tenantDatabase.Form.findOne({
+          where: {
+            formableId: paymentOrder.returns[0].id,
+            formableType: 'PurchaseReturn',
+          }
+        })
+        expect(form.done).toEqual(1)
+      })
+    })
   })
 })
 
