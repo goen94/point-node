@@ -673,16 +673,16 @@ describe('Payment Order - UpdateForm', () => {
         expect(mailerSpy).toHaveBeenCalled();
         expect(res.body.data).toMatchObject({
           id: expect.any(Number),
-          paymentType: createFormRequestDto.paymentType,
-          supplierId: createFormRequestDto.supplierId,
-          supplierName: createFormRequestDto.supplierName,
-          amount: createFormRequestDto.totalAmount,
+          paymentType: updateFormRequestDto.paymentType,
+          supplierId: updateFormRequestDto.supplierId,
+          supplierName: updateFormRequestDto.supplierName,
+          amount: updateFormRequestDto.totalAmount,
           invoices: [
             {
               id: expect.any(Number),
               purchasePaymentOrderId: res.body.data.id,
-              amount: createFormRequestDto.invoices[0].amount,
-              referenceableId: createFormRequestDto.invoices[0].id,
+              amount: updateFormRequestDto.invoices[0].amount,
+              referenceableId: updateFormRequestDto.invoices[0].id,
               referenceableType: 'PurchaseInvoice'
             }
           ],
@@ -690,8 +690,8 @@ describe('Payment Order - UpdateForm', () => {
             {
               id: expect.any(Number),
               purchasePaymentOrderId: res.body.data.id,
-              amount: createFormRequestDto.downPayments[0].amount,
-              referenceableId: createFormRequestDto.downPayments[0].id,
+              amount: updateFormRequestDto.downPayments[0].amount,
+              referenceableId: updateFormRequestDto.downPayments[0].id,
               referenceableType: 'PurchaseDownPayment'
             }
           ],
@@ -699,8 +699,8 @@ describe('Payment Order - UpdateForm', () => {
             {
               id: expect.any(Number),
               purchasePaymentOrderId: res.body.data.id,
-              amount: createFormRequestDto.returns[0].amount,
-              referenceableId: createFormRequestDto.returns[0].id,
+              amount: updateFormRequestDto.returns[0].amount,
+              referenceableId: updateFormRequestDto.returns[0].id,
               referenceableType: 'PurchaseReturn'
             }
           ],
@@ -708,18 +708,18 @@ describe('Payment Order - UpdateForm', () => {
             {
               id: expect.any(Number),
               purchasePaymentOrderId: res.body.data.id,
-              chartOfAccountId: createFormRequestDto.others[0].coaId,
-              allocationId: createFormRequestDto.others[0].allocationId,
-              amount: createFormRequestDto.others[0].amount,
-              notes: createFormRequestDto.others[0].notes,
+              chartOfAccountId: updateFormRequestDto.others[0].coaId,
+              allocationId: updateFormRequestDto.others[0].allocationId,
+              amount: updateFormRequestDto.others[0].amount,
+              notes: updateFormRequestDto.others[0].notes,
             },
             {
               id: expect.any(Number),
               purchasePaymentOrderId: res.body.data.id,
-              chartOfAccountId: createFormRequestDto.others[1].coaId,
-              allocationId: createFormRequestDto.others[1].allocationId,
-              amount: createFormRequestDto.others[1].amount,
-              notes: createFormRequestDto.others[1].notes,
+              chartOfAccountId: updateFormRequestDto.others[1].coaId,
+              allocationId: updateFormRequestDto.others[1].allocationId,
+              amount: updateFormRequestDto.others[1].amount,
+              notes: updateFormRequestDto.others[1].notes,
             }
           ],
           form: {
@@ -727,9 +727,9 @@ describe('Payment Order - UpdateForm', () => {
             approvalStatus: 0,
             id: expect.any(Number),
             branchId: branch.id,
-            date: createFormRequestDto.date.toISOString(),
+            date: updateFormRequestDto.date.toISOString(),
             number: oldForm.number,
-            notes: createFormRequestDto.notes,
+            notes: updateFormRequestDto.notes,
             createdBy: maker.id,
             updatedBy: maker.id,
             incrementNumber: 1,
@@ -745,10 +745,10 @@ describe('Payment Order - UpdateForm', () => {
         });
         expect(paymentOrder).toMatchObject({
           id: res.body.data.id,
-          paymentType: createFormRequestDto.paymentType,
-          supplierId: createFormRequestDto.supplierId,
-          supplierName: createFormRequestDto.supplierName,
-          amount: createFormRequestDto.totalAmount + '.000000000000000000000000000000',
+          paymentType: updateFormRequestDto.paymentType,
+          supplierId: updateFormRequestDto.supplierId,
+          supplierName: updateFormRequestDto.supplierName,
+          amount: updateFormRequestDto.totalAmount + '.000000000000000000000000000000',
         });
 
         const paymentOrderForm = await tenantDatabase.Form.findOne({
@@ -759,9 +759,9 @@ describe('Payment Order - UpdateForm', () => {
           approvalStatus: 0,
           id: res.body.data.form.id,
           BranchId: branch.id,
-          date: createFormRequestDto.date,
+          date: updateFormRequestDto.date,
           number: 'PP2212001',
-          notes: createFormRequestDto.notes,
+          notes: updateFormRequestDto.notes,
           createdBy: maker.id,
           updatedBy: maker.id,
           incrementNumber: 1,
@@ -777,8 +777,8 @@ describe('Payment Order - UpdateForm', () => {
         expect(invoice).toMatchObject({
           id: res.body.data.invoices[0].id,
           purchasePaymentOrderId: res.body.data.id,
-          amount: createFormRequestDto.invoices[0].amount + '.000000000000000000000000000000',
-          referenceableId: createFormRequestDto.invoices[0].id,
+          amount: updateFormRequestDto.invoices[0].amount + '.000000000000000000000000000000',
+          referenceableId: updateFormRequestDto.invoices[0].id,
           referenceableType: 'PurchaseInvoice'
         });
 
@@ -788,8 +788,8 @@ describe('Payment Order - UpdateForm', () => {
         expect(downPayment).toMatchObject({
           id: res.body.data.downPayments[0].id,
           purchasePaymentOrderId: res.body.data.id,
-          amount: createFormRequestDto.downPayments[0].amount + '.000000000000000000000000000000',
-          referenceableId: createFormRequestDto.downPayments[0].id,
+          amount: updateFormRequestDto.downPayments[0].amount + '.000000000000000000000000000000',
+          referenceableId: updateFormRequestDto.downPayments[0].id,
           referenceableType: 'PurchaseDownPayment'
         });
 
@@ -799,8 +799,8 @@ describe('Payment Order - UpdateForm', () => {
         expect(pReturn).toMatchObject({
           id: res.body.data.returns[0].id,
           purchasePaymentOrderId: res.body.data.id,
-          amount: createFormRequestDto.returns[0].amount + '.000000000000000000000000000000',
-          referenceableId: createFormRequestDto.returns[0].id,
+          amount: updateFormRequestDto.returns[0].amount + '.000000000000000000000000000000',
+          referenceableId: updateFormRequestDto.returns[0].id,
           referenceableType: 'PurchaseReturn'
         });
 
@@ -810,10 +810,10 @@ describe('Payment Order - UpdateForm', () => {
         expect(other).toMatchObject({
           id: res.body.data.others[0].id,
           purchasePaymentOrderId: res.body.data.id,
-          chartOfAccountId: createFormRequestDto.others[0].coaId,
-          allocationId: createFormRequestDto.others[0].allocationId,
-          amount: createFormRequestDto.others[0].amount + '.000000000000000000000000000000',
-          notes: createFormRequestDto.others[0].notes,
+          chartOfAccountId: updateFormRequestDto.others[0].coaId,
+          allocationId: updateFormRequestDto.others[0].allocationId,
+          amount: updateFormRequestDto.others[0].amount + '.000000000000000000000000000000',
+          notes: updateFormRequestDto.others[0].notes,
         });
 
         other = await tenantDatabase.PurchasePaymentOrderDetails.findOne({
@@ -822,10 +822,10 @@ describe('Payment Order - UpdateForm', () => {
         expect(other).toMatchObject({
           id: res.body.data.others[1].id,
           purchasePaymentOrderId: res.body.data.id,
-          chartOfAccountId: createFormRequestDto.others[1].coaId,
-          allocationId: createFormRequestDto.others[1].allocationId,
-          amount: createFormRequestDto.others[1].amount + '.000000000000000000000000000000',
-          notes: createFormRequestDto.others[1].notes,
+          chartOfAccountId: updateFormRequestDto.others[1].coaId,
+          allocationId: updateFormRequestDto.others[1].allocationId,
+          amount: updateFormRequestDto.others[1].amount + '.000000000000000000000000000000',
+          notes: updateFormRequestDto.others[1].notes,
         });
 
         await oldForm.reload();
@@ -925,13 +925,13 @@ describe('Payment Order - UpdateForm', () => {
     const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
 
     const availableInvoice = await purchaseInvoice.getAvailable();
-    expect(availableInvoice).toEqual(parseFloat(createFormRequestDto.invoices[0].amount));
+    expect(availableInvoice).toEqual(parseFloat(updateFormRequestDto.invoices[0].amount));
 
     const availableDownPayment = await purchaseDownPayment.getAvailable();
-    expect(availableDownPayment).toEqual(parseFloat(createFormRequestDto.downPayments[0].amount));
+    expect(availableDownPayment).toEqual(parseFloat(updateFormRequestDto.downPayments[0].amount));
 
     const availableReturn = await purchaseReturn.getAvailable();
-    expect(availableReturn).toEqual(parseFloat(createFormRequestDto.returns[0].amount));
+    expect(availableReturn).toEqual(parseFloat(updateFormRequestDto.returns[0].amount));
 
     request(app)
       .patch('/v1/purchase/payment-order/' + paymentOrder.id)
