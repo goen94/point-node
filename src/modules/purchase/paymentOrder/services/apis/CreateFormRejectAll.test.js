@@ -167,6 +167,14 @@ describe('Payment Order - CreateFormRejectAll', () => {
         expect(paymentOrderForm).toMatchObject({
           approvalStatus: -1,
         });
+
+        const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
+        const purchaseInvoiceForm = await purchaseInvoice.getForm();
+        const purchaseDownPaymentForm = await purchaseDownPayment.getForm();
+        const purchaseReturnForm = await purchaseReturn.getForm();
+        expect(purchaseInvoiceForm.done).toBe(false);
+        expect(purchaseDownPaymentForm.done).toBe(false);
+        expect(purchaseReturnForm.done).toBe(false);
       })
       .end(done);
   });
