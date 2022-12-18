@@ -164,6 +164,7 @@ describe('Payment Order - DeleteFormApprove', () => {
 
         const form = await paymentOrder.getForm();
         expect(form.cancellationStatus).toBe(0);
+        expect(form.done).toBe(false);
         expect(form.formableId).toBe(paymentOrder.id);
         expect(form.formableType).toBe('PurchasePaymentOrder');
       })
