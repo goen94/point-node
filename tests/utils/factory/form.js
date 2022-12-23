@@ -11,6 +11,7 @@ async function create({
   formableType,
   date = new Date(),
   number = 'DN2101001',
+  approvalStatus = undefined,
   cancellationStatus = undefined,
 }) {
   const form = await Form.create({
@@ -24,6 +25,7 @@ async function create({
     createdBy,
     updatedBy,
     requestApprovalTo,
+    approvalStatus,
     cancellationStatus,
   });
 

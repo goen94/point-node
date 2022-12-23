@@ -12,7 +12,7 @@
   "scripts": {
     "start": "pm2 start ecosystem.config.json --no-daemon",
     "dev": "cross-env NODE_ENV=development nodemon src/index.js",
-    "test": "jest --colors --verbose --runInBand --detectOpenHandles --forceExit",
+    "test": "jest --colors --verbose --runInBand --detectOpenHandles --no-cache --forceExit --testPathPattern src/modules/purchase/paymentOrder/services/apis/CreateFormApprove.test.js",
     "test:watch": "jest --runInBand --watchAll",
     "coverage": "jest --coverage --runInBand --detectOpenHandles --forceExit",
     "lint": "eslint .",
@@ -58,6 +58,7 @@
     "passport-jwt": "^4.0.0",
     "pm2": "^5.1.0",
     "redis": "^3.1.2",
+    "redis-mock": "^0.56.3",
     "sequelize": "^6.6.5",
     "swagger-jsdoc": "^6.0.8",
     "swagger-ui-express": "^4.1.6",

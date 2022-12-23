@@ -21,19 +21,35 @@ global.beforeAll(async (done) => {
 
 global.beforeEach(async () => {
   try {
-    await mainSequelize.query('SET FOREIGN_KEY_CHECKS = 0', null);
-    await tenantSequelize.query('SET FOREIGN_KEY_CHECKS = 0', null);
+    await mainSequelize.query('SET FOREIGN_KEY_CHECKS = 0', null, { raw: true });
+    await tenantSequelize.query('SET FOREIGN_KEY_CHECKS = 0', null, { raw: true });
 
     await mainSequelize.truncate({ cascade: true, force: true });
     await tenantSequelize.truncate({ cascade: true, force: true });
 
-    await mainSequelize.query('SET FOREIGN_KEY_CHECKS = 1', null);
-    await tenantSequelize.query('SET FOREIGN_KEY_CHECKS = 1', null);
+    await mainSequelize.query('SET FOREIGN_KEY_CHECKS = 1', null, { raw: true });
+    await tenantSequelize.query('SET FOREIGN_KEY_CHECKS = 1', null, { raw: true });
 
     await setupTenantProject();
   } catch (e) {
-    // eslint-disable-next-line no-console
-    // console.log(e);
+    console.log(e);
+  }
+});
+
+global.afterEach(async () => {
+  try {
+    await mainSequelize.query('SET FOREIGN_KEY_CHECKS = 0', null, { raw: true });
+    await tenantSequelize.query('SET FOREIGN_KEY_CHECKS = 0', null, { raw: true });
+
+    await mainSequelize.truncate({ cascade: true, force: true });
+    await tenantSequelize.truncate({ cascade: true, force: true });
+
+    await mainSequelize.query('SET FOREIGN_KEY_CHECKS = 1', null, { raw: true });
+    await tenantSequelize.query('SET FOREIGN_KEY_CHECKS = 1', null, { raw: true });
+
+    await setupTenantProject();
+  } catch (e) {
+    console.log(e);
   }
 });
 
@@ -74,8 +90,8 @@ async function setupTenantProject() {
     isActive: true,
   });
   await Project.create({
-    code: 'tenant_test',
-    name: 'tenant_test',
+    code: 'test_dev',
+    name: 'test_dev',
     totalUser: 1,
     ownerId: user.id,
     packageId: pointPackage.id,

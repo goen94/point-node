@@ -9,6 +9,12 @@ const form = require('./form');
 const inventory = require('./inventory');
 const item = require('./item');
 const itemUnit = require('./itemUnit');
+const payment = require('./payment');
+const paymentDetail = require('./paymentDetail');
+const permission = require('./permission');
+const purchaseDownPayment = require('./purchaseDownPayment');
+const purchaseInvoice = require('./purchaseInvoice');
+const purchaseReturn = require('./purchaseReturn');
 const user = require('./user');
 const userWarehouse = require('./userWarehouse');
 const warehouse = require('./warehouse');
@@ -16,6 +22,7 @@ const salesInvoice = require('./salesInvoice');
 const salesInvoiceItem = require('./salesInvoiceItem');
 const stockCorrection = require('./stockCorrection');
 const stockCorrectionItem = require('./stockCorrectionItem');
+const supplier = require('./supplier');
 const inventoryAudit = require('./inventoryAudit');
 const inventoryAuditItem = require('./inventoryAuditItem');
 const salesVisitation = require('./salesVisitation');
@@ -33,6 +40,12 @@ const factory = {
   inventory,
   item,
   itemUnit,
+  payment,
+  paymentDetail,
+  permission,
+  purchaseDownPayment,
+  purchaseInvoice,
+  purchaseReturn,
   user,
   userWarehouse,
   warehouse,
@@ -40,6 +53,7 @@ const factory = {
   salesInvoiceItem,
   stockCorrection,
   stockCorrectionItem,
+  supplier,
   inventoryAudit,
   inventoryAuditItem,
   salesVisitation,

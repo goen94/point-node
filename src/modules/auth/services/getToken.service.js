@@ -27,6 +27,7 @@ async function getUserDataFromMainServer(accessToken) {
   const requestUrl = `${config.mainPointUrl}/api/v1/auth/fetch`;
   const requestHeaders = { Authorization: `Bearer ${accessToken}` };
   const requestBody = { access_token: accessToken };
+  console.log(accessToken)
   try {
     const {
       data: { data },

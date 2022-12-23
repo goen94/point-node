@@ -8,6 +8,7 @@ const verifyCallback = (req, resolve, reject, requiredRights) => async (err, pay
   }
 
   const { User, ModelHasRole, Role } = req.currentTenantDatabase;
+  console.log(payload.sub)
   const user = await User.findOne({
     where: { id: payload.sub },
     include: [{ model: ModelHasRole, as: 'modelHasRole', include: [{ model: Role, as: 'role' }] }],
@@ -19,6 +20,7 @@ const verifyCallback = (req, resolve, reject, requiredRights) => async (err, pay
   if (requiredRights.length) {
     const hasRequiredRights = await user.isPermitted(requiredRights);
     if (!hasRequiredRights) {
+      console.log("masuk sini kah")
       return reject(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
     }
   }
