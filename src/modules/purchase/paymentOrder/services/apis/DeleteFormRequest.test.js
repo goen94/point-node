@@ -164,7 +164,7 @@ describe('Payment Order - DeleteFormRequest', () => {
       .send(deleteFormRequestDto)
       .expect(async (res) => {
         expect(res.status).toEqual(httpStatus.NO_CONTENT);
-        //expect(mailerSpy).toHaveBeenCalled();
+        expect(mailerSpy).toHaveBeenCalled();
 
         const form = await paymentOrder.getForm();
         expect(form.cancellationStatus).toBe(0);
