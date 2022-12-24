@@ -457,78 +457,6 @@ describe('Payment Order - UpdateForm', () => {
       .end(done);
   });
 
-  it('throw error on purchase invoice supplier invalid', async (done) => {
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const { purchaseInvoice, formPurchaseInvoice, branch } = recordFactories;
-    const invalidSupplier = await factory.supplier.create({ branch });
-    await purchaseInvoice.update({
-      supplierId: invalidSupplier.id,
-    });
-
-    request(app)
-      .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(updateFormRequestDto)
-      .expect('Content-Type', /json/)
-      .expect((res) => {
-        expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
-        expect(res.body).toMatchObject({
-          message: `invalid supplier for form ${formPurchaseInvoice.number}`
-        })
-      })
-      .end(done);
-  });
-
-  it('throw error on purchase down payment supplier invalid', async (done) => {
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const { purchaseDownPayment, formPurchaseDownPayment, branch } = recordFactories;
-    const invalidSupplier = await factory.supplier.create({ branch });
-    await purchaseDownPayment.update({
-      supplierId: invalidSupplier.id,
-    });
-
-    request(app)
-      .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(updateFormRequestDto)
-      .expect('Content-Type', /json/)
-      .expect((res) => {
-        expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
-        expect(res.body).toMatchObject({
-          message: `invalid supplier for form ${formPurchaseDownPayment.number}`
-        })
-      })
-      .end(done);
-  });
-
-  it('throw error on purchase return supplier invalid', async (done) => {
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const { purchaseReturn, formPurchaseReturn, branch } = recordFactories;
-    const invalidSupplier = await factory.supplier.create({ branch });
-    await purchaseReturn.update({
-      supplierId: invalidSupplier.id,
-    });
-
-    request(app)
-      .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(updateFormRequestDto)
-      .expect('Content-Type', /json/)
-      .expect((res) => {
-        expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
-        expect(res.body).toMatchObject({
-          message: `invalid supplier for form ${formPurchaseReturn.number}`
-        })
-      })
-      .end(done);
-  });
-
   it('throw error if purchase invoice order more than available', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
     const { formPurchaseInvoice } = recordFactories;
@@ -915,8 +843,8 @@ describe('Payment Order - UpdateForm', () => {
             notes: updateFormRequestDto.notes,
             createdBy: maker.id,
             updatedBy: maker.id,
-            incrementNumber: 1,
-            incrementGroup: 202212,
+            incrementNumber: oldForm.incrementNumber,
+            incrementGroup: oldForm.incrementGroup,
             formableId: res.body.data.id,
             formableType: 'PurchasePaymentOrder',
             requestApprovalTo: approver.id,
@@ -943,12 +871,12 @@ describe('Payment Order - UpdateForm', () => {
           id: res.body.data.form.id,
           BranchId: branch.id,
           date: updateFormRequestDto.date,
-          number: 'PP2212001',
+          number: oldForm.number,
           notes: updateFormRequestDto.notes,
           createdBy: maker.id,
           updatedBy: maker.id,
-          incrementNumber: 1,
-          incrementGroup: 202212,
+          incrementNumber: oldForm.incrementNumber,
+          incrementGroup: oldForm.incrementGroup,
           formableId: res.body.data.id,
           formableType: 'PurchasePaymentOrder',
           requestApprovalTo: approver.id,
