@@ -60,7 +60,7 @@ describe('Payment Order - FindHistory', () => {
       .set('Tenant', 'test_dev')
       .expect('Content-Type', /json/)
       .expect(async (res) => {
-
+        const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
         const user = await tenantDatabase.User.findOne({
           where: { id: form.createdBy }
         })
@@ -80,7 +80,7 @@ describe('Payment Order - FindHistory', () => {
           tableType: 'PurchasePaymentOrder',
           tableId: paymentOrder.id,
           number: form.number,
-          date: expect.any(String),
+          date: expect.stringMatching(isoPattern),
           userId: form.createdBy,
           activity: 'Created',
           formableId: paymentOrder.id,
