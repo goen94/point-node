@@ -197,10 +197,11 @@ describe('Payment Order - UpdateForm', () => {
     });
 
     it('throw if invoices array empty', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       updateFormRequestDto.invoices = []
   
       request(app)
-        .post('/v1/purchase/payment-order')
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
@@ -216,10 +217,11 @@ describe('Payment Order - UpdateForm', () => {
     });
 
     it('throw if invoices null', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto['invoices']
   
       request(app)
-        .post('/v1/purchase/payment-order')
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
@@ -235,10 +237,11 @@ describe('Payment Order - UpdateForm', () => {
     });
 
     it('throw if invoices amount null', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto.invoices[0]['amount']
   
       request(app)
-        .post('/v1/purchase/payment-order')
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
@@ -254,10 +257,11 @@ describe('Payment Order - UpdateForm', () => {
     });
 
     it('throw if invoices amount zero', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       updateFormRequestDto.invoices[0].amount = 0
   
       request(app)
-        .post('/v1/purchase/payment-order')
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
@@ -273,10 +277,11 @@ describe('Payment Order - UpdateForm', () => {
     });
 
     it('throw on totalInvoiceAmount', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto['totalInvoiceAmount']
   
       request(app)
-        .post('/v1/purchase/payment-order')
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
@@ -292,10 +297,11 @@ describe('Payment Order - UpdateForm', () => {
     });
 
     it('throw on totalDownPaymentAmount', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto['totalDownPaymentAmount']
   
       request(app)
-        .post('/v1/purchase/payment-order')
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
@@ -311,10 +317,11 @@ describe('Payment Order - UpdateForm', () => {
     });
 
     it('throw on totalReturnAmount', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto['totalReturnAmount']
   
       request(app)
-        .post('/v1/purchase/payment-order')
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
@@ -330,10 +337,11 @@ describe('Payment Order - UpdateForm', () => {
     });
 
     it('throw on totalOtherAmount', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto['totalOtherAmount']
   
       request(app)
-        .post('/v1/purchase/payment-order')
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
@@ -349,10 +357,11 @@ describe('Payment Order - UpdateForm', () => {
     });
 
     it('throw on totalAmount', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto['totalAmount']
   
       request(app)
-        .post('/v1/purchase/payment-order')
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
