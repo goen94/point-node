@@ -173,7 +173,17 @@ describe('Payment Order - DeleteFormApprove', () => {
         });
         expect(paymentOrderForm).toMatchObject({
           cancellationStatus: 1,
+          cancellationApprovalAt: expect.any(Date),
+          cancellationApprovalBy: approver.id,
         });
+
+        const activity = await tenantDatabase.UserActivity.findOne({
+          where: {
+            number: paymentOrderForm.editedNumber,
+            activity: 'Cancellation Approved',
+          }
+        })
+        expect(activity).toBeDefined();
 
         expect(availableInvoice).toEqual(
           availableInvoiceNow + createFormRequestDto.invoices[0].amount

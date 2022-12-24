@@ -195,6 +195,177 @@ describe('Payment Order - UpdateForm', () => {
         })
         .end(done);
     });
+
+    it('throw if invoices array empty', async (done) => {
+      updateFormRequestDto.invoices = []
+  
+      request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"invoices" must contain at least 1 items`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw if invoices null', async (done) => {
+      delete updateFormRequestDto['invoices']
+  
+      request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"invoices" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw if invoices amount null', async (done) => {
+      delete updateFormRequestDto.invoices[0]['amount']
+  
+      request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"invoices[0].amount" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw if invoices amount zero', async (done) => {
+      updateFormRequestDto.invoices[0].amount = 0
+  
+      request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"invoices[0].amount" must be greater than or equal to 1`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw on totalInvoiceAmount', async (done) => {
+      delete updateFormRequestDto['totalInvoiceAmount']
+  
+      request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"totalInvoiceAmount" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw on totalDownPaymentAmount', async (done) => {
+      delete updateFormRequestDto['totalDownPaymentAmount']
+  
+      request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"totalDownPaymentAmount" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw on totalReturnAmount', async (done) => {
+      delete updateFormRequestDto['totalReturnAmount']
+  
+      request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"totalReturnAmount" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw on totalOtherAmount', async (done) => {
+      delete updateFormRequestDto['totalOtherAmount']
+  
+      request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"totalOtherAmount" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw on totalAmount', async (done) => {
+      delete updateFormRequestDto['totalAmount']
+  
+      request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"totalAmount" is required`
+          })
+        })
+        .end(done);
+    });
   });
 
   it('throw error if purchase invoice not exist', async (done) => {
@@ -438,7 +609,7 @@ describe('Payment Order - UpdateForm', () => {
       .end(done);
   });
 
-  it('throw error if notes have space at start or end', async (done) => {
+  it('trim notes if have space at start or end', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
     updateFormRequestDto.notes = ' example notes ';
 
@@ -450,9 +621,9 @@ describe('Payment Order - UpdateForm', () => {
       .send(updateFormRequestDto)
       .expect('Content-Type', /json/)
       .expect((res) => {
-        expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
-        expect(res.body).toMatchObject({
-          message: `notes can\'t have space at start or end`
+        expect(res.status).toEqual(httpStatus.CREATED);
+        expect(res.body.data.form).toMatchObject({
+          notes: 'example notes',
         })
       })
       .end(done);

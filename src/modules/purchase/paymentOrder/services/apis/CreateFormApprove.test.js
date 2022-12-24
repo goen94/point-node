@@ -125,7 +125,17 @@ describe('Payment Order - CreateFormApprove', () => {
         });
         expect(paymentOrderForm).toMatchObject({
           approvalStatus: 1,
+          approvalAt: expect.any(Date),
+          approvalBy: approver.id,
         });
+
+        const activity = await tenantDatabase.UserActivity.findOne({
+          where: {
+            number: paymentOrderForm.editedNumber,
+            activity: 'Approved',
+          }
+        })
+        expect(activity).toBeDefined();
       })
       .end(done);
   })

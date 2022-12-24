@@ -14,7 +14,7 @@ beforeEach(() => {
   ProcessSendCreateApproval.mockClear();
 });
 
-describe('Payment Order - DeleteFormApprove', () => {
+describe('Payment Order - DeleteFormReject', () => {
   let recordFactories, createFormRequestDto, jwtoken, makerToken, approver
   beforeEach(async (done) => {
     recordFactories = await generateRecordFactories();
@@ -191,7 +191,17 @@ describe('Payment Order - DeleteFormApprove', () => {
         });
         expect(paymentOrderForm).toMatchObject({
           cancellationStatus: -1,
+          cancellationApprovalAt: expect.any(Date),
+          cancellationApprovalBy: approver.id,
         });
+
+        const activity = await tenantDatabase.UserActivity.findOne({
+          where: {
+            number: paymentOrderForm.editedNumber,
+            activity: 'Cancellation Rejected',
+          }
+        });
+        expect(activity).toBeDefined();
 
         await purchaseInvoiceForm.reload();
         await purchaseDownPaymentForm.reload();

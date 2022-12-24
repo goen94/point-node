@@ -1,4 +1,3 @@
-const faker = require('faker');
 const tenantDatabase = require('@src/models').tenant;
 const factory = require('@root/tests/utils/factory');
 const httpStatus = require('http-status');
@@ -14,119 +13,145 @@ beforeEach(() => {
   ProcessSendCreateApproval.mockClear();
 });
 
-describe('Payment Order - CreateFormReject', () => {
-  let recordFactories, createFormRequestDto, jwtoken, makerToken
+describe('Payment Order - FindOne', () => {
+  let recordFactories, createFormRequestDto, jwtoken
   beforeEach(async (done) => {
     recordFactories = await generateRecordFactories();
     createFormRequestDto = generateCreateFormRequestDto(recordFactories);
-    jwtoken = token.generateToken(recordFactories.approver.id);
-    makerToken = token.generateToken(recordFactories.maker.id);
+    jwtoken = token.generateToken(recordFactories.maker.id);
     request(app)
       .post('/v1/purchase/payment-order')
-      .set('Authorization', 'Bearer '+ makerToken)
+      .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
       .send(createFormRequestDto)
       .end(done);
   });
 
-  it('throw error if reason is empty', async (done) => {
+  it('throw when requested by user that does not have branch default ', async (done) => {
+    const { branchUser } = recordFactories
+    await branchUser.update({
+      isDefault: false
+    });
+
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const createFormRejectDto = {
-      reason: '',
-    };
 
     request(app)
-      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/reject')
+      .get('/v1/purchase/payment-order/' + paymentOrder.id)
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
-      .send(createFormRejectDto)
       .expect('Content-Type', /json/)
       .expect((res) => {
-        expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+        expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `"reason" is not allowed to be empty`
+          message: 'please set default branch to read this form'
         })
       })
       .end(done);
   });
 
-  it('throw error if reason more than 255 character', async (done) => {
+  it('throw when requested by user that does not have read permission ', async (done) => {
+    await tenantDatabase.RoleHasPermission.destroy({
+      where: {},
+      truncate: true
+    });
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const createFormRejectDto = {
-      reason: faker.datatype.string(500),
-    };
 
     request(app)
-      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/reject')
+      .get('/v1/purchase/payment-order/' + paymentOrder.id)
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
-      .send(createFormRejectDto)
-      .expect('Content-Type', /json/)
-      .expect((res) => {
-        expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-        expect(res.body).toMatchObject({
-          message: `"reason" length must be less than or equal to 255 characters long`
-        })
-      })
-      .end(done);
-  });
-
-  it('throw error when rejected by unwanted user', async (done) => {
-    const hacker = await factory.user.create();
-    const { branch } = recordFactories;
-    await factory.branchUser.create({ user: hacker, branch, isDefault: true });
-    await factory.permission.create('purchase payment order', hacker);
-    jwtoken = token.generateToken(hacker.id);
-
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const createFormRejectDto = {
-      reason: faker.datatype.string(20),
-    };
-
-    request(app)
-      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/reject')
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(createFormRejectDto)
       .expect('Content-Type', /json/)
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.FORBIDDEN);
         expect(res.body).toMatchObject({
-          message: 'Forbidden - You are not the selected approver'
+          message: 'Forbidden'
         });
       })
       .end(done);
   });
 
-  it('success reject form', async (done) => {
-    const { approver } = recordFactories;
+  it('success return data', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const createFormRejectDto = {
-      reason: faker.datatype.string(20),
-    };
-    const form = await paymentOrder.getForm();
-
     request(app)
-      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/reject')
+      .get('/v1/purchase/payment-order/' + paymentOrder.id)
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
-      .send(createFormRejectDto)
       .expect('Content-Type', /json/)
       .expect(async (res) => {
-        await form.reload();
-        const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+        const invoices = await paymentOrder.getInvoices();
+        const downPayments = await paymentOrder.getDownPayments();
+        const returns = await paymentOrder.getReturns();
+        const others = await paymentOrder.getOthers();
+        const form = await paymentOrder.getForm();
+        const supplier = await paymentOrder.getSupplier();
+
         expect(res.status).toEqual(httpStatus.OK);
-        expect(res.body.data).toMatchObject({
+        expect(res.body.data[0]).toMatchObject({
           id: paymentOrder.id,
           paymentType: paymentOrder.paymentType,
           supplierId: paymentOrder.supplierId,
           supplierName: paymentOrder.supplierName,
           amount: paymentOrder.amount,
+          supplier: {
+            id: supplier.id,
+            code: supplier.code,
+            name: supplier.name,
+            address: supplier.address,
+            city: supplier.city,
+            state: supplier.state,
+            country: supplier.country,
+            phone: supplier.phone,
+            email: supplier.email
+          },
+          invoices: [
+            {
+              id: invoices[0].id,
+              purchasePaymentOrderId: paymentOrder.id,
+              amount: invoices[0].amount,
+              referenceableId: invoices[0].referenceableId,
+              referenceableType: invoices[0].referenceableType
+            }
+          ],
+          downPayments: [
+            {
+              id: downPayments[0].id,
+              purchasePaymentOrderId: paymentOrder.id,
+              amount: downPayments[0].amount,
+              referenceableId: downPayments[0].referenceableId,
+              referenceableType: downPayments[0].referenceableType
+            }
+          ],
+          returns: [
+            {
+              id: returns[0].id,
+              purchasePaymentOrderId: paymentOrder.id,
+              amount: returns[0].amount,
+              referenceableId: returns[0].referenceableId,
+              referenceableType: returns[0].referenceableType
+            }
+          ],
+          others: [
+            {
+              id: others[0].id,
+              purchasePaymentOrderId: paymentOrder.id,
+              chartOfAccountId: others[0].coaId,
+              allocationId: others[0].allocationId,
+              amount: others[0].amount,
+              notes: others[0].notes
+            },
+            {
+              id: others[1].id,
+              purchasePaymentOrderId: paymentOrder.id,
+              chartOfAccountId: others[1].coaId,
+              allocationId: others[1].allocationId,
+              amount: others[1].amount,
+              notes: others[1].notes
+            }
+          ],
           form: {
             id: form.id,
             branchId: form.branchId,
@@ -143,10 +168,10 @@ describe('Payment Order - CreateFormReject', () => {
             formableId: form.formableId,
             formableType: form.formableType,
             requestApprovalTo: form.requestApprovalTo,
-            approvalBy: form.approvalBy,
-            approvalAt: expect.stringMatching(isoPattern),
+            approvalBy: approver.id,
+            approvalAt: form.approvalAt.toISOString(),
             approvalReason: form.approvalReason,
-            approvalStatus: -1,
+            approvalStatus: 1,
             requestCancellationTo: form.requestCancellationTo,
             requestCancellationBy: form.requestCancellationBy,
             requestCancellationAt: form.requestCancellationAt,
@@ -156,28 +181,11 @@ describe('Payment Order - CreateFormReject', () => {
             cancellationApprovalReason: form.cancellationApprovalReason,
             cancellationStatus: form.cancellationStatus,
           }
-        });
-
-        const paymentOrderForm = await tenantDatabase.Form.findOne({
-          where: { id: res.body.data.form.id }
-        });
-        expect(paymentOrderForm).toMatchObject({
-          approvalStatus: -1,
-          approvalAt: expect.any(Date),
-          approvalBy: approver.id,
-        });
-
-        const activity = await tenantDatabase.UserActivity.findOne({
-          where: {
-            number: paymentOrderForm.editedNumber,
-            activity: 'Rejected',
-          }
         })
-        expect(activity).toBeDefined();
       })
       .end(done);
-  });
-});
+  })
+})
 
 const generateRecordFactories = async ({
   maker,

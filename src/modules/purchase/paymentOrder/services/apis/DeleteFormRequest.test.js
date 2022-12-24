@@ -14,12 +14,11 @@ beforeEach(() => {
   ProcessSendCreateApproval.mockClear();
 });
 
-describe('Payment Order - DeleteFormApprove', () => {
-  let recordFactories, createFormRequestDto, updateFormRequestDto, jwtoken
+describe('Payment Order - DeleteFormRequest', () => {
+  let recordFactories, createFormRequestDto, jwtoken
   beforeEach(async (done) => {
     recordFactories = await generateRecordFactories();
     createFormRequestDto = generateCreateFormRequestDto(recordFactories);
-    updateFormRequestDto = generateUpdateFormRequestDto(recordFactories);
     jwtoken = token.generateToken(recordFactories.maker.id);
 
     request(app)
@@ -314,59 +313,6 @@ const generateRecordFactories = async ({
 };
 
 const generateCreateFormRequestDto = (recordFactories) => {
-  const {
-    purchaseInvoice,
-    purchaseDownPayment,
-    purchaseReturn,
-    chartOfAccountExpense,
-    chartOfAccountIncome,
-    approver,
-    supplier,
-    allocation,
-  } = recordFactories;
-
-  return {
-    paymentType: 'cash',
-    supplierId: supplier.id || 1,
-    supplierName: supplier.name || 'Supplier',
-    date: new Date('2022-12-03'),
-    invoices: [{
-      id: purchaseInvoice.id,
-      amount: 100000
-    }],
-    downPayments: [{
-      id: purchaseDownPayment.id,
-      amount: 20000
-    }],
-    returns: [{
-      id: purchaseReturn.id,
-      amount: 10000
-    }],
-    others: [
-      {
-        coaId: chartOfAccountExpense.id,
-        notes: 'example notes',
-        amount: 5000,
-        allocationId: allocation.id,
-      },
-      {
-        coaId: chartOfAccountIncome.id,
-        notes: 'example notes',
-        amount: 10000,
-        allocationId: allocation.id,
-      },
-    ],
-    requestApprovalTo: approver.id,
-    totalInvoiceAmount: 100000,
-    totalDownPaymentAmount: 20000,
-    totalReturnAmount: 10000,
-    totalOtherAmount: 5000,
-    totalAmount: 65000,
-    notes: 'example form note',
-  }
-}
-
-const generateUpdateFormRequestDto = (recordFactories) => {
   const {
     purchaseInvoice,
     purchaseDownPayment,

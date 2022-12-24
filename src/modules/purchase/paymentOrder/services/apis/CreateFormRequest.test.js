@@ -758,7 +758,7 @@ describe('Payment Order - CreateFormRequest', () => {
             id: expect.any(Number),
             branchId: branch.id,
             date: createFormRequestDto.date.toISOString(),
-            number: 'PP2212001',
+            number: 'PP' + moment(createFormRequestDto.date).format('YYMM') + '001',
             notes: createFormRequestDto.notes,
             createdBy: maker.id,
             updatedBy: maker.id,
@@ -858,6 +858,13 @@ describe('Payment Order - CreateFormRequest', () => {
           notes: createFormRequestDto.others[1].notes,
         });
 
+        const activity = await tenantDatabase.UserActivity.findOne({
+          where: {
+            number: paymentOrderForm.editedNumber,
+            activity: 'Created',
+          }
+        })
+        expect(activity).toBeDefined();
       })
 
       const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
