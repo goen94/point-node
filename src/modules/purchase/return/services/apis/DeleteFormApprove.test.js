@@ -160,6 +160,33 @@ describe('Purchase Return - DeleteFormApprove', () => {
       })
       .end(done);
   });
+
+  it('throw error when approved by unwanted user', async (done) => {
+    const hacker = await factory.user.create();
+    const { branch, approver } = recordFactories;
+    await factory.branchUser.create({ user: hacker, branch, isDefault: true });
+    await factory.permission.create('purchase return', hacker);
+    jwtoken = token.generateToken(hacker.id);
+
+    const purchaseReturn = await tenantDatabase.PurchaseReturn.findOne();
+    const formPurchaseReturn = await purchaseReturn.getForm();
+    await formPurchaseReturn.update({
+      cancellationStatus: 0,
+      requestCancellationTo: approver.id
+    });
+
+    request(app)
+      .post('/v1/purchase/return/' + purchaseReturn.id + '/cancellation-approve')
+      .set('Authorization', 'Bearer '+ jwtoken)
+      .set('Tenant', 'test_dev')
+      .expect((res) => {
+        expect(res.status).toEqual(httpStatus.FORBIDDEN);
+        expect(res.body).toMatchObject({
+          message: `Forbidden - You are not the selected approver`
+        })
+      })
+      .end(done);
+  });
 });
 
 
