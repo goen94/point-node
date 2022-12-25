@@ -15,18 +15,17 @@ beforeEach(() => {
   ProcessSendCreateApproval.mockClear();
 });
 
-
 describe('Payment Order - UpdateForm', () => {
   let recordFactories, createFormRequestDto, updateFormRequestDto, jwtoken
   beforeEach(async (done) => {
     recordFactories = await generateRecordFactories();
     createFormRequestDto = generateCreateFormRequestDto(recordFactories);
     updateFormRequestDto = generateUpdateFormRequestDto(recordFactories);
-    jwtoken = token.generateToken(recordFactories.approver.id);
+    jwtoken = token.generateToken(recordFactories.maker.id);
 
     request(app)
       .post('/v1/purchase/payment-order')
-      .set('Authorization', 'Bearer '+ makerToken)
+      .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
       .send(createFormRequestDto)
@@ -35,9 +34,13 @@ describe('Payment Order - UpdateForm', () => {
 
   it('throw error when requested by user with different branch', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const { branchUser } = recordFactories;
+    const { maker } = recordFactories;
+    await tenantDatabase.BranchUser.destroy({
+      where: {},
+      truncate: true
+    });
     const branch = await factory.branch.create();
-    await branchUser.update({ branchId: branch.id, isDefault: true });
+    await factory.branchUser.create({ user: maker, branch, isDefault: true });
 
     request(app)
       .patch('/v1/purchase/payment-order/' + paymentOrder.id)
@@ -47,6 +50,7 @@ describe('Payment Order - UpdateForm', () => {
       .send(updateFormRequestDto)
       .expect('Content-Type', /json/)
       .expect((res) => {
+        console.log(res.body)
         expect(res.status).toEqual(httpStatus.FORBIDDEN);
         expect(res.body).toMatchObject({
           message: `please set default branch same as form to update this form`
@@ -79,9 +83,10 @@ describe('Payment Order - UpdateForm', () => {
   });
 
   it('throw error if already referenced in payment', async (done) => {
-    const { maker, approver } = recordFactories;
-    const payment = await factory.payment.create({ paymentOrder });
-    await factory.paymentDetail.create({ paymentOrder, chartOfAccountExpense });
+    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+    const { maker, approver, supplier, chartOfAccountIncome, chartOfAccountExpense, branch } = recordFactories;
+    const payment = await factory.payment.create({ supplier, paymentType: 'cash', chartOfAccount: chartOfAccountIncome });
+    await factory.paymentDetail.create({ payment, paymentOrder, chartOfAccount: chartOfAccountExpense });
     const formPayment =
       await factory.form.create({
         branch,
@@ -89,12 +94,10 @@ describe('Payment Order - UpdateForm', () => {
         createdBy: maker.id,
         updatedBy: maker.id,
         requestApprovalTo: approver.id,
-        formable: paymentOrder,
+        formable: payment,
         formableType: 'Payment',
         number: 'CASH/OUT/2211001',
       });
-
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
 
     request(app)
       .patch('/v1/purchase/payment-order/' + paymentOrder.id)
@@ -125,7 +128,7 @@ describe('Payment Order - UpdateForm', () => {
         .send(updateFormRequestDto)
         .expect('Content-Type', /json/)
         .expect((res) => {
-          expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
           expect(res.body).toMatchObject({
             message: `"paymentType" is required`
           })
@@ -188,6 +191,186 @@ describe('Payment Order - UpdateForm', () => {
           expect(res.status).toEqual(httpStatus.BAD_REQUEST);
           expect(res.body).toMatchObject({
             message: `"requestApprovalTo" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw if invoices array empty', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+      updateFormRequestDto.invoices = []
+  
+      request(app)
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"invoices" must contain at least 1 items`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw if invoices null', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+      delete updateFormRequestDto['invoices']
+  
+      request(app)
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"invoices" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw if invoices amount null', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+      delete updateFormRequestDto.invoices[0]['amount']
+  
+      request(app)
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"invoices[0].amount" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw if invoices amount zero', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+      updateFormRequestDto.invoices[0].amount = 0
+  
+      request(app)
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"invoices[0].amount" must be greater than or equal to 1`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw on totalInvoiceAmount', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+      delete updateFormRequestDto['totalInvoiceAmount']
+  
+      request(app)
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"totalInvoiceAmount" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw on totalDownPaymentAmount', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+      delete updateFormRequestDto['totalDownPaymentAmount']
+  
+      request(app)
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"totalDownPaymentAmount" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw on totalReturnAmount', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+      delete updateFormRequestDto['totalReturnAmount']
+  
+      request(app)
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"totalReturnAmount" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw on totalOtherAmount', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+      delete updateFormRequestDto['totalOtherAmount']
+  
+      request(app)
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"totalOtherAmount" is required`
+          })
+        })
+        .end(done);
+    });
+
+    it('throw on totalAmount', async (done) => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+      delete updateFormRequestDto['totalAmount']
+  
+      request(app)
+        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(updateFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: `"totalAmount" is required`
           })
         })
         .end(done);
@@ -269,78 +452,6 @@ describe('Payment Order - UpdateForm', () => {
         expect(res.status).toEqual(httpStatus.NOT_FOUND);
         expect(res.body).toMatchObject({
           message: `supplier not exist`
-        })
-      })
-      .end(done);
-  });
-
-  it('throw error on purchase invoice supplier invalid', async (done) => {
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const { purchaseInvoice, formPurchaseInvoice, branch } = recordFactories;
-    const invalidSupplier = await factory.supplier.create({ branch });
-    await purchaseInvoice.update({
-      supplierId: invalidSupplier.id,
-    });
-
-    request(app)
-      .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(updateFormRequestDto)
-      .expect('Content-Type', /json/)
-      .expect((res) => {
-        expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
-        expect(res.body).toMatchObject({
-          message: `invalid supplier for form ${formPurchaseInvoice.number}`
-        })
-      })
-      .end(done);
-  });
-
-  it('throw error on purchase down payment supplier invalid', async (done) => {
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const { purchaseDownPayment, formPurchaseDownPayment, branch } = recordFactories;
-    const invalidSupplier = await factory.supplier.create({ branch });
-    await purchaseDownPayment.update({
-      supplierId: invalidSupplier.id,
-    });
-
-    request(app)
-      .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(updateFormRequestDto)
-      .expect('Content-Type', /json/)
-      .expect((res) => {
-        expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
-        expect(res.body).toMatchObject({
-          message: `invalid supplier for form ${formPurchaseDownPayment.number}`
-        })
-      })
-      .end(done);
-  });
-
-  it('throw error on purchase return supplier invalid', async (done) => {
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const { purchaseReturn, formPurchaseReturn, branch } = recordFactories;
-    const invalidSupplier = await factory.supplier.create({ branch });
-    await purchaseReturn.update({
-      supplierId: invalidSupplier.id,
-    });
-
-    request(app)
-      .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(updateFormRequestDto)
-      .expect('Content-Type', /json/)
-      .expect((res) => {
-        expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
-        expect(res.body).toMatchObject({
-          message: `invalid supplier for form ${formPurchaseReturn.number}`
         })
       })
       .end(done);
@@ -435,7 +546,7 @@ describe('Payment Order - UpdateForm', () => {
       .end(done);
   });
 
-  it('throw error if notes have space at start or end', async (done) => {
+  it('trim notes if have space at start or end', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
     updateFormRequestDto.notes = ' example notes ';
 
@@ -447,9 +558,9 @@ describe('Payment Order - UpdateForm', () => {
       .send(updateFormRequestDto)
       .expect('Content-Type', /json/)
       .expect((res) => {
-        expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
-        expect(res.body).toMatchObject({
-          message: `notes can\'t have space at start or end`
+        expect(res.status).toEqual(httpStatus.CREATED);
+        expect(res.body.data.form).toMatchObject({
+          notes: 'example notes',
         })
       })
       .end(done);
@@ -655,13 +766,13 @@ describe('Payment Order - UpdateForm', () => {
       .end(done);
   });
 
-  it('check saved data same with data sent', async (done) => {
+  it('check saved data same with data sent', async () => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
     const oldForm = await paymentOrder.getForm();
     const { branch, maker, approver } = recordFactories;
     const mailerSpy = jest.spyOn(ProcessSendCreateApproval.prototype, 'call').mockReturnValue(true);
 
-    request(app)
+    await request(app)
       .patch('/v1/purchase/payment-order/' + paymentOrder.id)
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
@@ -732,8 +843,8 @@ describe('Payment Order - UpdateForm', () => {
             notes: updateFormRequestDto.notes,
             createdBy: maker.id,
             updatedBy: maker.id,
-            incrementNumber: 1,
-            incrementGroup: 202212,
+            incrementNumber: oldForm.incrementNumber,
+            incrementGroup: oldForm.incrementGroup,
             formableId: res.body.data.id,
             formableType: 'PurchasePaymentOrder',
             requestApprovalTo: approver.id,
@@ -760,12 +871,12 @@ describe('Payment Order - UpdateForm', () => {
           id: res.body.data.form.id,
           BranchId: branch.id,
           date: updateFormRequestDto.date,
-          number: 'PP2212001',
+          number: oldForm.number,
           notes: updateFormRequestDto.notes,
           createdBy: maker.id,
           updatedBy: maker.id,
-          incrementNumber: 1,
-          incrementGroup: 202212,
+          incrementNumber: oldForm.incrementNumber,
+          incrementGroup: oldForm.incrementGroup,
           formableId: res.body.data.id,
           formableType: 'PurchasePaymentOrder',
           requestApprovalTo: approver.id,
@@ -839,8 +950,7 @@ describe('Payment Order - UpdateForm', () => {
           }
         })
         expect(archive).toBeDefined();
-      })
-      .end(done);
+      });
   });
 
   it('check journal balance', async () => {
@@ -856,15 +966,15 @@ describe('Payment Order - UpdateForm', () => {
   it('check payment order not available to cash out / bank out', async () => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
 
-    request(app)
+    await request(app)
       .patch('/v1/purchase/payment-order/' + paymentOrder.id)
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
       .send(updateFormRequestDto)
       .expect('Content-Type', /json/)
-      .expect(async (done) => {
-        request(app)
+      .expect(async () => {
+        await request(app)
           .get('/v1/purchase/payment-order?filter_form=pending;approvalApproved')
           .set('Authorization', 'Bearer '+ jwtoken)
           .set('Tenant', 'test_dev')
@@ -873,23 +983,21 @@ describe('Payment Order - UpdateForm', () => {
           .expect(async (res) => {
             expect(res.status).toEqual(httpStatus.OK);
             expect(res.body.data.length).toEqual(0);
-          })
-          .end(done);
-      })
-      .end(done);
+          });
+      });
   });
 
   it('check form reference still pending if amount less than available', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
     const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
 
-    const availableInvoice = await purchaseInvoice.getAvailable();
+    const availableInvoice = (await purchaseInvoice.getAvailable()) + createFormRequestDto.invoices[0].amount;
     expect(availableInvoice).toBeGreaterThan(parseFloat(updateFormRequestDto.invoices[0].amount));
 
-    const availableDownPayment = await purchaseDownPayment.getAvailable();
+    const availableDownPayment = (await purchaseDownPayment.getAvailable()) + createFormRequestDto.downPayments[0].amount;
     expect(availableDownPayment).toBeGreaterThan(parseFloat(updateFormRequestDto.downPayments[0].amount));
 
-    const availableReturn = await purchaseReturn.getAvailable();
+    const availableReturn = (await purchaseReturn.getAvailable()) + createFormRequestDto.returns[0].amount;
     expect(availableReturn).toBeGreaterThan(parseFloat(updateFormRequestDto.returns[0].amount));
 
     request(app)
@@ -912,7 +1020,7 @@ describe('Payment Order - UpdateForm', () => {
       .end(done);
   });
 
-  it('check form reference done if amount same as available', async (done) => {
+  it('check form reference done if amount same as available', async () => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
     updateFormRequestDto.invoices[0].amount = 220000;
     updateFormRequestDto.totalInvoiceAmount = 220000;
@@ -924,23 +1032,23 @@ describe('Payment Order - UpdateForm', () => {
 
     const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
 
-    const availableInvoice = await purchaseInvoice.getAvailable();
+    const availableInvoice = (await purchaseInvoice.getAvailable()) + createFormRequestDto.invoices[0].amount;
     expect(availableInvoice).toEqual(parseFloat(updateFormRequestDto.invoices[0].amount));
 
-    const availableDownPayment = await purchaseDownPayment.getAvailable();
+    const availableDownPayment = (await purchaseDownPayment.getAvailable()) + createFormRequestDto.downPayments[0].amount;
     expect(availableDownPayment).toEqual(parseFloat(updateFormRequestDto.downPayments[0].amount));
 
-    const availableReturn = await purchaseReturn.getAvailable();
+    const availableReturn = (await purchaseReturn.getAvailable()) + createFormRequestDto.returns[0].amount;
     expect(availableReturn).toEqual(parseFloat(updateFormRequestDto.returns[0].amount));
 
-    request(app)
+    await request(app)
       .patch('/v1/purchase/payment-order/' + paymentOrder.id)
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
       .send(updateFormRequestDto)
       .expect('Content-Type', /json/)
-      .expect(async (res) => {
+      .expect(async () => {
         const formInvoice = await purchaseInvoice.getForm();
         expect(formInvoice.done).toEqual(true);
 
@@ -949,8 +1057,7 @@ describe('Payment Order - UpdateForm', () => {
         
         const formReturn = await purchaseReturn.getForm();
         expect(formReturn.done).toEqual(true);
-      })
-      .end(done);
+      });
   });
 });
 

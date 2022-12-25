@@ -14,29 +14,29 @@ beforeEach(() => {
 });
 
 describe('Payment Order - DeleteFormApprove', () => {
-  let recordFactories, createFormRequestDto, jwtoken, availableInvoice, availableDownPayment, availableReturn
-  beforeEach(async (done) => {
+  let recordFactories, createFormRequestDto, jwtoken, makerToken, availableInvoice, availableDownPayment, availableReturn
+  beforeEach(async () => {
     recordFactories = await generateRecordFactories();
     createFormRequestDto = generateCreateFormRequestDto(recordFactories);
     jwtoken = token.generateToken(recordFactories.approver.id);
-    const makerToken = token.generateToken(recordFactories.maker.id);
-
-    const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
-    availableInvoice = await purchaseInvoice.getAvailable();
-    availableDownPayment = await purchaseDownPayment.getAvailable();
-    availableReturn = await purchaseReturn.getAvailable();
-
-    request(app)
+    makerToken = token.generateToken(recordFactories.maker.id);
+    
+    await request(app)
       .post('/v1/purchase/payment-order')
       .set('Authorization', 'Bearer '+ makerToken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
       .send(createFormRequestDto)
-      .end(done);
+    
+    const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
+    availableInvoice = await purchaseInvoice.getAvailable();
+    availableDownPayment = await purchaseDownPayment.getAvailable();
+    availableReturn = await purchaseReturn.getAvailable();
   });
 
   it('throw if form already approved', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+    const { approver } = recordFactories;
     const formPaymentOrder = await paymentOrder.getForm();
     await formPaymentOrder.update({
       cancellationStatus: 1,
@@ -44,13 +44,14 @@ describe('Payment Order - DeleteFormApprove', () => {
     });
 
     request(app)
-      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancel-approve')
+      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancellation-approve')
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .expect((res) => {
+        console.log(res.body)
         expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `Form already cancelled`
+          message: `form not requested to be delete`
         })
       })
       .end(done);
@@ -71,10 +72,11 @@ describe('Payment Order - DeleteFormApprove', () => {
     });
 
     request(app)
-      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancel-approve')
+      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancellation-approve')
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .expect((res) => {
+        console.log(res.body)
         expect(res.status).toEqual(httpStatus.FORBIDDEN);
         expect(res.body).toMatchObject({
           message: `Forbidden - You are not the selected approver`
@@ -83,7 +85,7 @@ describe('Payment Order - DeleteFormApprove', () => {
       .end(done);
   });
 
-  it('success approve', async (done) => {
+  it('success approve', async () => {
     createFormRequestDto.invoices[0].amount = availableInvoice;
     createFormRequestDto.totalInvoiceAmount = availableInvoice;
     createFormRequestDto.downPayments[0].amount = availableDownPayment;
@@ -94,104 +96,117 @@ describe('Payment Order - DeleteFormApprove', () => {
       availableDownPayment - availableReturn - createFormRequestDto.totalOtherAmount;
 
     // create form done first
-    request(app)
+    let id
+    await request(app)
       .post('/v1/purchase/payment-order')
       .set('Authorization', 'Bearer '+ makerToken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
       .send(createFormRequestDto)
-      .expect(async (res, done) => {
-        const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne({
-          where: { id: res.body.data.id }
+      .expect(async (res) => {
+        id = res.body.data.id;        
+      });
+
+    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne({
+      where: { id }
+    });
+
+    const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
+    const availableInvoiceNow = await purchaseInvoice.getAvailable();
+    const availableDownPaymentNow = await purchaseDownPayment.getAvailable();
+    const availableReturnNow = await purchaseReturn.getAvailable();
+
+    const form = await paymentOrder.getForm();
+    const { approver } = recordFactories;
+    await form.update({
+      cancellationStatus: 0,
+      requestCancellationTo: approver.id
+    });
+
+    await request(app)
+      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancellation-approve')
+      .set('Authorization', 'Bearer '+ jwtoken)
+      .set('Tenant', 'test_dev')
+      .expect(async (res) => {
+        await form.reload();
+        const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+        expect(res.status).toEqual(httpStatus.OK);
+        expect(res.body.data).toMatchObject({
+          id: paymentOrder.id,
+          paymentType: paymentOrder.paymentType,
+          supplierId: paymentOrder.supplierId,
+          supplierName: paymentOrder.supplierName,
+          amount: paymentOrder.amount,
+          form: {
+            id: form.id,
+            branchId: form.branchId,
+            date: form.date.toISOString(),
+            number: form.number,
+            editedNumber: form.editedNumber,
+            notes: form.notes,
+            editedNotes: form.editedNotes,
+            createdBy: form.createdBy,
+            updatedBy: form.updatedBy,
+            done: form.done,
+            incrementNumber: form.incrementNumber,
+            incrementGroup: form.incrementGroup,
+            formableId: form.formableId,
+            formableType: form.formableType,
+            requestApprovalTo: form.requestApprovalTo,
+            approvalBy: form.approvalBy,
+            approvalAt: form.approvalAt,
+            approvalReason: form.approvalReason,
+            approvalStatus: form.approvalStatus,
+            requestCancellationTo: form.requestCancellationTo,
+            requestCancellationBy: form.requestCancellationBy,
+            requestCancellationAt: form.requestCancellationAt,
+            requestCancellationReason: form.requestCancellationReason,
+            cancellationApprovalAt: expect.stringMatching(isoPattern),
+            cancellationApprovalBy: approver.id,
+            cancellationApprovalReason: form.cancellationApprovalReason,
+            cancellationStatus: 1,
+          }
         });
 
-        const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
-        const availableInvoiceNow = await purchaseInvoice.getAvailable();
-        const availableDownPaymentNow = await purchaseDownPayment.getAvailable();
-        const availableReturnNow = await purchaseReturn.getAvailable();
-
-        const form = await paymentOrder.getForm();
-        const { approver } = recordFactories;
-        await form.update({
-          cancellationStatus: 0,
-          requestCancellationTo: approver.id
+        const paymentOrderForm = await tenantDatabase.Form.findOne({
+          where: { id: res.body.data.form.id }
+        });
+        expect(paymentOrderForm).toMatchObject({
+          cancellationStatus: 1,
+          cancellationApprovalAt: expect.any(Date),
+          cancellationApprovalBy: approver.id,
         });
 
-        request(app)
-          .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancel-approve')
-          .set('Authorization', 'Bearer '+ jwtoken)
-          .set('Tenant', 'test_dev')
-          .expect(async (res) => {
-            await form.reload();
-            expect(res.status).toEqual(httpStatus.OK);
-            expect(res.body.data).toMatchObject({
-              id: paymentOrder.id,
-              paymentType: paymentOrder.paymentType,
-              supplierId: paymentOrder.supplierId,
-              supplierName: paymentOrder.supplierName,
-              amount: paymentOrder.amount,
-              form: {
-                id: form.id,
-                branchId: form.branchId,
-                date: form.date.toISOString(),
-                number: form.number,
-                editedNumber: form.editedNumber,
-                notes: form.notes,
-                editedNotes: form.editedNotes,
-                createdBy: form.createdBy,
-                updatedBy: form.updatedBy,
-                done: form.done,
-                incrementNumber: form.incrementNumber,
-                incrementGroup: form.incrementGroup,
-                formableId: form.formableId,
-                formableType: form.formableType,
-                requestApprovalTo: form.requestApprovalTo,
-                approvalBy: form.approvalBy,
-                approvalAt: form.approvalAt.toISOString(),
-                approvalReason: form.approvalReason,
-                approvalStatus: form.approvalStatus,
-                requestCancellationTo: form.requestCancellationTo,
-                requestCancellationBy: form.requestCancellationBy,
-                requestCancellationAt: form.requestCancellationAt,
-                requestCancellationReason: form.requestCancellationReason,
-                cancellationApprovalAt: form.cancellationApprovalAt,
-                cancellationApprovalBy: approver.id,
-                cancellationApprovalReason: form.cancellationApprovalReason,
-                cancellationStatus: 1,
-              }
-            });
+        const activity = await tenantDatabase.UserActivity.findOne({
+          where: {
+            number: paymentOrderForm.number,
+            activity: 'Cancellation Approved',
+          }
+        })
+        expect(activity).toBeDefined();
 
-            const paymentOrderForm = await tenantDatabase.Form.findOne({
-              where: { id: res.body.data.form.id }
-            });
-            expect(paymentOrderForm).toMatchObject({
-              cancellationStatus: 1,
-            });
+        expect(availableInvoice).toEqual(
+          availableInvoiceNow + createFormRequestDto.invoices[0].amount
+        );
+        expect(availableDownPayment).toEqual(
+          availableDownPaymentNow + createFormRequestDto.downPayments[0].amount
+        );
+        expect(availableReturn).toEqual(
+          availableReturnNow + createFormRequestDto.returns[0].amount
+        );
 
-            expect(availableInvoice).toEqual(
-              availableInvoiceNow + createFormRequestDto.invoices[0].amount
-            );
-            expect(availableDownPayment).toEqual(
-              availableDownPaymentNow + createFormRequestDto.downPayments[0].amount
-            );
-            expect(availableReturn).toEqual(
-              availableReturnNow + createFormRequestDto.returns[0].amount
-            );
+        const formInvoice = await purchaseInvoice.getForm();
+        expect(formInvoice.done).toEqual(false);
 
-            const formInvoice = await purchaseInvoice.getForm();
-            expect(formInvoice.done).toEqual(false);
-
-            const formDownPayment = await purchaseDownPayment.getForm();
-            expect(formDownPayment.done).toEqual(false);
-            
-            const formReturn = await purchaseReturn.getForm();
-            expect(formReturn.done).toEqual(false);
-          })
-          .end(done);
-      })
-      .end(done);    
+        const formDownPayment = await purchaseDownPayment.getForm();
+        expect(formDownPayment.done).toEqual(false);
+        
+        const formReturn = await purchaseReturn.getForm();
+        expect(formReturn.done).toEqual(false);
+      });
   });
 });
+
 
 const generateRecordFactories = async ({
   maker,

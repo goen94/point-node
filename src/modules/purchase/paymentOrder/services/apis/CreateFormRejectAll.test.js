@@ -166,7 +166,17 @@ describe('Payment Order - CreateFormRejectAll', () => {
         });
         expect(paymentOrderForm).toMatchObject({
           approvalStatus: -1,
+          approvalAt: expect.any(Date),
+          approvalBy: approver.id,
         });
+
+        const activity = await tenantDatabase.UserActivity.findOne({
+          where: {
+            number: paymentOrderForm.editedNumber,
+            activity: 'Rejected By Email',
+          }
+        });
+        expect(activity).toBeDefined();
 
         const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
         const purchaseInvoiceForm = await purchaseInvoice.getForm();

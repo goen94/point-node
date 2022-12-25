@@ -14,7 +14,7 @@ beforeEach(() => {
   ProcessSendCreateApproval.mockClear();
 });
 
-describe('Payment Order - DeleteFormApprove', () => {
+describe('Payment Order - DeleteFormRequest', () => {
   let recordFactories, createFormRequestDto, jwtoken
   beforeEach(async (done) => {
     recordFactories = await generateRecordFactories();
@@ -32,9 +32,13 @@ describe('Payment Order - DeleteFormApprove', () => {
 
   it('throw error when requested by user with different branch', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const { branchUser } = recordFactories;
+    const { maker } = recordFactories;
+    await tenantDatabase.BranchUser.destroy({
+      where: {},
+      truncate: true
+    });
     const branch = await factory.branch.create();
-    await branchUser.update({ branchId: branch.id, isDefault: true });
+    await factory.branchUser.create({ user: maker, branch, isDefault: true });
 
     const deleteFormRequestDto = {
       reason: 'example reason',
@@ -48,9 +52,10 @@ describe('Payment Order - DeleteFormApprove', () => {
       .send(deleteFormRequestDto)
       .expect('Content-Type', /json/)
       .expect((res) => {
+        console.log(res.body)
         expect(res.status).toEqual(httpStatus.FORBIDDEN);
         expect(res.body).toMatchObject({
-          message: `please set default branch same as form to delete this form`
+          message: `please set default branch same as form to update this form`
         })
       })
       .end(done);
@@ -84,9 +89,10 @@ describe('Payment Order - DeleteFormApprove', () => {
   });
 
   it('throw error if already referenced in payment', async (done) => {
-    const { maker, approver } = recordFactories;
-    const payment = await factory.payment.create({ paymentOrder });
-    await factory.paymentDetail.create({ paymentOrder, chartOfAccountExpense });
+    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+    const { maker, approver, supplier, chartOfAccountIncome, chartOfAccountExpense, branch } = recordFactories;
+    const payment = await factory.payment.create({ supplier, paymentType: 'cash', chartOfAccount: chartOfAccountIncome });
+    await factory.paymentDetail.create({ payment, paymentOrder, chartOfAccount: chartOfAccountExpense });
     const formPayment =
       await factory.form.create({
         branch,
@@ -94,12 +100,11 @@ describe('Payment Order - DeleteFormApprove', () => {
         createdBy: maker.id,
         updatedBy: maker.id,
         requestApprovalTo: approver.id,
-        formable: paymentOrder,
+        formable: payment,
         formableType: 'Payment',
         number: 'CASH/OUT/2211001',
       });
 
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
     const deleteFormRequestDto = {
       reason: 'example reason',
     };
@@ -123,7 +128,7 @@ describe('Payment Order - DeleteFormApprove', () => {
   it('throw error if reason is empty', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
     const deleteFormRequestDto = {
-      reason: null,
+      reason: '',
     };
 
     request(app)
@@ -136,7 +141,7 @@ describe('Payment Order - DeleteFormApprove', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.BAD_REQUEST);
         expect(res.body).toMatchObject({
-          message: `"reason" is required`
+          message: `"reason" is not allowed to be empty`
         })
       })
       .end(done);
@@ -157,7 +162,6 @@ describe('Payment Order - DeleteFormApprove', () => {
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
       .send(deleteFormRequestDto)
-      .expect('Content-Type', /json/)
       .expect(async (res) => {
         expect(res.status).toEqual(httpStatus.NO_CONTENT);
         expect(mailerSpy).toHaveBeenCalled();

@@ -171,7 +171,7 @@ describe('Payment Order - FindOne', () => {
             approvalBy: approver.id,
             approvalAt: form.approvalAt.toISOString(),
             approvalReason: form.approvalReason,
-            approvalStatus: 1,
+            approvalStatus: form.approvalStatus,
             requestCancellationTo: form.requestCancellationTo,
             requestCancellationBy: form.requestCancellationBy,
             requestCancellationAt: form.requestCancellationAt,

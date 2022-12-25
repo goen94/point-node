@@ -1,3 +1,4 @@
+const faker = require('faker');
 const tenantDatabase = require('@src/models').tenant;
 const factory = require('@root/tests/utils/factory');
 const httpStatus = require('http-status');
@@ -13,13 +14,14 @@ beforeEach(() => {
   ProcessSendCreateApproval.mockClear();
 });
 
-describe('Payment Order - DeleteFormApprove', () => {
-  let recordFactories, createFormRequestDto, jwtoken
+describe('Payment Order - DeleteFormReject', () => {
+  let recordFactories, createFormRequestDto, jwtoken, makerToken, approver
   beforeEach(async (done) => {
     recordFactories = await generateRecordFactories();
     createFormRequestDto = generateCreateFormRequestDto(recordFactories);
     jwtoken = token.generateToken(recordFactories.approver.id);
-    const makerToken = token.generateToken(recordFactories.maker.id);
+    makerToken = token.generateToken(recordFactories.maker.id);
+    approver = recordFactories.approver;
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -30,14 +32,19 @@ describe('Payment Order - DeleteFormApprove', () => {
       .end(done);
   });
 
-  it('throw error if reason is empty', async () => {
+  it('throw error if reason is empty', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+    const formPaymentOrder = await paymentOrder.getForm();
+    await formPaymentOrder.update({
+      cancellationStatus: 0,
+      requestCancellationTo: approver.id
+    });
     const deleteFormRejectDto = {
-      reason: null,
+      reason: '',
     };
 
     request(app)
-      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancel-reject')
+      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancellation-reject')
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
@@ -46,20 +53,25 @@ describe('Payment Order - DeleteFormApprove', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.BAD_REQUEST);
         expect(res.body).toMatchObject({
-          message: `"reason" is required`
+          message: `"reason" is not allowed to be empty`
         })
       })
       .end(done);
   });
 
-  it('throw error if reason more than 255 character', async () => {
+  it('throw error if reason more than 255 character', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+    const formPaymentOrder = await paymentOrder.getForm();
+    await formPaymentOrder.update({
+      cancellationStatus: 0,
+      requestCancellationTo: approver.id
+    });
     const deleteFormRejectDto = {
       reason: faker.datatype.string(500),
     };
 
     request(app)
-      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancel-reject')
+      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancellation-reject')
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
@@ -74,7 +86,7 @@ describe('Payment Order - DeleteFormApprove', () => {
       .end(done);
   });
 
-  it('throw error when rejected by unwanted user', async () => {
+  it('throw error when rejected by unwanted user', async (done) => {
     const hacker = await factory.user.create();
     const { branch } = recordFactories;
     await factory.branchUser.create({ user: hacker, branch, isDefault: true });
@@ -82,12 +94,17 @@ describe('Payment Order - DeleteFormApprove', () => {
     jwtoken = token.generateToken(hacker.id);
 
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+    const formPaymentOrder = await paymentOrder.getForm();
+    await formPaymentOrder.update({
+      cancellationStatus: 0,
+      requestCancellationTo: approver.id
+    });
     const deleteFormRejectDto = {
       reason: faker.datatype.string(20),
     };
 
     request(app)
-      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancel-reject')
+      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancellation-reject')
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
@@ -102,8 +119,13 @@ describe('Payment Order - DeleteFormApprove', () => {
       .end(done);
   });
 
-  it('success reject form', async () => {
+  it('success reject form', async (done) => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+    const formPaymentOrder = await paymentOrder.getForm();
+    await formPaymentOrder.update({
+      cancellationStatus: 0,
+      requestCancellationTo: approver.id
+    });
     const deleteFormRejectDto = {
       reason: faker.datatype.string(20),
     };
@@ -117,7 +139,7 @@ describe('Payment Order - DeleteFormApprove', () => {
     expect(purchaseReturnForm.done).toBe(false);
 
     request(app)
-      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancel-reject')
+      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/cancellation-reject')
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
@@ -125,6 +147,7 @@ describe('Payment Order - DeleteFormApprove', () => {
       .expect('Content-Type', /json/)
       .expect(async (res) => {
         const form = await paymentOrder.getForm();
+        const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
         expect(res.status).toEqual(httpStatus.OK);
         expect(res.body.data).toMatchObject({
           id: paymentOrder.id,
@@ -148,15 +171,15 @@ describe('Payment Order - DeleteFormApprove', () => {
             formableId: form.formableId,
             formableType: form.formableType,
             requestApprovalTo: form.requestApprovalTo,
-            approvalBy: approver.id,
-            approvalAt: form.approvalAt.toISOString(),
+            approvalBy: form.approvalBy,
+            approvalAt: form.approvalAt,
             approvalReason: form.approvalReason,
             approvalStatus: form.approvalStatus,
             requestCancellationTo: form.requestCancellationTo,
             requestCancellationBy: form.requestCancellationBy,
             requestCancellationAt: form.requestCancellationAt,
             requestCancellationReason: form.requestCancellationReason,
-            cancellationApprovalAt: form.cancellationApprovalAt,
+            cancellationApprovalAt: expect.stringMatching(isoPattern),
             cancellationApprovalBy: form.cancellationApprovalBy,
             cancellationApprovalReason: form.cancellationApprovalReason,
             cancellationStatus: -1,
@@ -168,7 +191,17 @@ describe('Payment Order - DeleteFormApprove', () => {
         });
         expect(paymentOrderForm).toMatchObject({
           cancellationStatus: -1,
+          cancellationApprovalAt: expect.any(Date),
+          cancellationApprovalBy: approver.id,
         });
+
+        const activity = await tenantDatabase.UserActivity.findOne({
+          where: {
+            number: paymentOrderForm.number,
+            activity: 'Cancellation Rejected',
+          }
+        });
+        expect(activity).toBeDefined();
 
         await purchaseInvoiceForm.reload();
         await purchaseDownPaymentForm.reload();

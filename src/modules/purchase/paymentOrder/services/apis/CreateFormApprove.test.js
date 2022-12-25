@@ -14,12 +14,12 @@ beforeEach(() => {
 });
 
 describe('Payment Order - CreateFormApprove', () => {
-  let recordFactories, createFormRequestDto, jwtoken
+  let recordFactories, createFormRequestDto, jwtoken, makerToken
   beforeEach(async (done) => {
     recordFactories = await generateRecordFactories();
     createFormRequestDto = generateCreateFormRequestDto(recordFactories);
     jwtoken = token.generateToken(recordFactories.approver.id);
-    const makerToken = token.generateToken(recordFactories.maker.id);
+    makerToken = token.generateToken(recordFactories.maker.id);
     request(app)
       .post('/v1/purchase/payment-order')
       .set('Authorization', 'Bearer '+ makerToken)
@@ -125,34 +125,44 @@ describe('Payment Order - CreateFormApprove', () => {
         });
         expect(paymentOrderForm).toMatchObject({
           approvalStatus: 1,
+          approvalAt: expect.any(Date),
+          approvalBy: approver.id,
         });
+
+        const activity = await tenantDatabase.UserActivity.findOne({
+          where: {
+            number: paymentOrderForm.number,
+            activity: 'Approved',
+          }
+        })
+        expect(activity).toBeDefined();
       })
       .end(done);
   })
 
-  it('check payment order available to cash out / bank out', async (done) => {
+  it('check payment order available to cash out / bank out', async () => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
     const form = await paymentOrder.getForm();
     const { approver } = recordFactories;
 
-    request(app)
+    const invoices = await paymentOrder.getInvoices();
+    const downPayments = await paymentOrder.getDownPayments();
+    const returns = await paymentOrder.getReturns();
+    const others = await paymentOrder.getOthers();
+
+    await request(app)
       .post('/v1/purchase/payment-order/' + paymentOrder.id + '/approve')
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
-      .expect(async (done) => {
-        request(app)
+      .expect(async () => {
+        await request(app)
           .get('/v1/purchase/payment-order?filter_form=pending;approvalApproved')
-          .set('Authorization', 'Bearer '+ jwtoken)
+          .set('Authorization', 'Bearer '+ makerToken)
           .set('Tenant', 'test_dev')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
           .expect(async (res) => {
-            const invoices = await paymentOrder.getInvoices();
-            const downPayments = await paymentOrder.getDownPayments();
-            const returns = await paymentOrder.getReturns();
-            const others = await paymentOrder.getOthers();
             await form.reload();
-
             expect(res.status).toEqual(httpStatus.OK);
             expect(res.body.data[0]).toMatchObject({
               id: paymentOrder.id,
@@ -191,7 +201,7 @@ describe('Payment Order - CreateFormApprove', () => {
                 {
                   id: others[0].id,
                   purchasePaymentOrderId: paymentOrder.id,
-                  chartOfAccountId: others[0].coaId,
+                  chartOfAccountId: others[0].chartOfAccountId,
                   allocationId: others[0].allocationId,
                   amount: others[0].amount,
                   notes: others[0].notes
@@ -199,7 +209,7 @@ describe('Payment Order - CreateFormApprove', () => {
                 {
                   id: others[1].id,
                   purchasePaymentOrderId: paymentOrder.id,
-                  chartOfAccountId: others[1].coaId,
+                  chartOfAccountId: others[1].chartOfAccountId,
                   allocationId: others[1].allocationId,
                   amount: others[1].amount,
                   notes: others[1].notes
@@ -236,9 +246,7 @@ describe('Payment Order - CreateFormApprove', () => {
               }
             });
           })
-          .end(done);
       })
-      .end(done);
   });
 })
 
