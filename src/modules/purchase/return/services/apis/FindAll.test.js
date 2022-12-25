@@ -948,7 +948,6 @@ describe('Purcahse Return - FindAll', () => {
   });
 });
 
-
 const generateCreateFormRequestDto = ({ 
   approver,
   supplier,
@@ -982,9 +981,7 @@ const generateCreateFormRequestDto = ({
       },
     ],
     notes: 'example purchase return note',
-    approver: approver.id,
-    approverName: approver.name,
-    approverEmail: approver.email,
+    requestApprovalTo: approver.id,
     subTotal: 100000,
     typeOfTax: 'exclude',
     taxBase: 100000,

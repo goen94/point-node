@@ -364,13 +364,11 @@ const generateCreateFormRequestDto = ({
       },
     ],
     notes: 'example purchase return note',
-    approver: approver.id,
-    approverName: approver.name,
-    approverEmail: approver.email,
+    requestApprovalTo: approver.id,
     subTotal: 100000,
     typeOfTax: 'exclude',
-    taxbase: 100000,
-    total: 109090.90909090909,
+    taxBase: 100000,
+    amount: 109090.90909090909,
     tax: 9090.90909090909
   };
 };
