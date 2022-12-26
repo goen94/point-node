@@ -36,7 +36,7 @@ describe('Payment Order - FindAll', () => {
       const pendingPaymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
   
       const res = await request(app)
-        .post('/v1/purchase/return')
+        .post('/v1/purchase/payment-order')
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
@@ -250,7 +250,7 @@ describe('Payment Order - FindAll', () => {
                 formableId: formApprovedPaymentOrder.formableId,
                 formableType: formApprovedPaymentOrder.formableType,
                 requestApprovalTo: formApprovedPaymentOrder.requestApprovalTo,
-                approvalBy: approver.id,
+                approvalBy: formApprovedPaymentOrder.approvalBy,
                 approvalAt: formApprovedPaymentOrder.approvalAt.toISOString(),
                 approvalReason: formApprovedPaymentOrder.approvalReason,
                 approvalStatus: formApprovedPaymentOrder.approvalStatus,
@@ -272,7 +272,7 @@ describe('Payment Order - FindAll', () => {
       const pendingPaymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
   
       const res = await request(app)
-        .post('/v1/purchase/return')
+        .post('/v1/purchase/payment-order')
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
@@ -486,7 +486,7 @@ describe('Payment Order - FindAll', () => {
                 formableId: formDonePaymentOrder.formableId,
                 formableType: formDonePaymentOrder.formableType,
                 requestApprovalTo: formDonePaymentOrder.requestApprovalTo,
-                approvalBy: approver.id,
+                approvalBy: formDonePaymentOrder.approvalBy,
                 approvalAt: formDonePaymentOrder.approvalAt.toISOString(),
                 approvalReason: formDonePaymentOrder.approvalReason,
                 approvalStatus: formDonePaymentOrder.approvalStatus,
@@ -502,6 +502,544 @@ describe('Payment Order - FindAll', () => {
             }
           ]);
         });      
+    });
+
+    it('return current month data if date filter is empty', async () => {
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+  
+      createFormRequestDto.date = new Date('2022-11-01');
+      await request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(createFormRequestDto);
+  
+      await request(app)
+        .get('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .expect('Content-Type', /json/)
+        .expect(async (res) => {
+          const invoices = await paymentOrder.getInvoices();
+          const downPayments = await paymentOrder.getDownPayments();
+          const returns = await paymentOrder.getReturns();
+          const others = await paymentOrder.getOthers();
+          const form = await paymentOrder.getForm();
+          const supplier = await paymentOrder.getSupplier();
+  
+          expect(res.status).toEqual(httpStatus.OK);
+          expect(res.body).toMatchObject({
+            data: expect.any(Array),
+            meta: {
+              currentPage: expect.any(Number),
+              lastPage: expect.any(Number),
+              perPage: expect.any(Number),
+              total: 1
+            }
+          });
+          expect(res.body.data[0]).toMatchObject({
+            id: paymentOrder.id,
+            paymentType: paymentOrder.paymentType,
+            supplierId: paymentOrder.supplierId,
+            supplierName: paymentOrder.supplierName,
+            amount: paymentOrder.amount,
+            supplier: {
+              id: supplier.id,
+              code: supplier.code,
+              name: supplier.name,
+              address: supplier.address,
+              city: supplier.city,
+              state: supplier.state,
+              country: supplier.country,
+              phone: supplier.phone,
+              email: supplier.email
+            },
+            invoices: [
+              {
+                id: invoices[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: invoices[0].amount,
+                referenceableId: invoices[0].referenceableId,
+                referenceableType: invoices[0].referenceableType
+              }
+            ],
+            downPayments: [
+              {
+                id: downPayments[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: downPayments[0].amount,
+                referenceableId: downPayments[0].referenceableId,
+                referenceableType: downPayments[0].referenceableType
+              }
+            ],
+            returns: [
+              {
+                id: returns[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: returns[0].amount,
+                referenceableId: returns[0].referenceableId,
+                referenceableType: returns[0].referenceableType
+              }
+            ],
+            others: [
+              {
+                id: others[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                chartOfAccountId: others[0].coaId,
+                allocationId: others[0].allocationId,
+                amount: others[0].amount,
+                notes: others[0].notes
+              },
+              {
+                id: others[1].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                chartOfAccountId: others[1].coaId,
+                allocationId: others[1].allocationId,
+                amount: others[1].amount,
+                notes: others[1].notes
+              }
+            ],
+            form: {
+              id: form.id,
+              branchId: form.branchId,
+              date: form.date.toISOString(),
+              number: form.number,
+              editedNumber: form.editedNumber,
+              notes: form.notes,
+              editedNotes: form.editedNotes,
+              createdBy: form.createdBy,
+              updatedBy: form.updatedBy,
+              done: form.done,
+              incrementNumber: form.incrementNumber,
+              incrementGroup: form.incrementGroup,
+              formableId: form.formableId,
+              formableType: form.formableType,
+              requestApprovalTo: form.requestApprovalTo,
+              approvalBy: form.approvalBy,
+              approvalAt: form.approvalAt.toISOString(),
+              approvalReason: form.approvalReason,
+              approvalStatus: form.approvalStatus,
+              requestCancellationTo: form.requestCancellationTo,
+              requestCancellationBy: form.requestCancellationBy,
+              requestCancellationAt: form.requestCancellationAt,
+              requestCancellationReason: form.requestCancellationReason,
+              cancellationApprovalAt: form.cancellationApprovalAt,
+              cancellationApprovalBy: form.cancellationApprovalBy,
+              cancellationApprovalReason: form.cancellationApprovalReason,
+              cancellationStatus: form.cancellationStatus,
+            },
+          })
+        });
+    });
+
+    it('return form with status approved', async () => {
+      const res = await request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(createFormRequestDto);
+      
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne({
+        where: { id: res.body.data.id }
+      });
+      const form = await paymentOrder.getForm();
+      await form.update({
+        approvalStatus: 1
+      });
+  
+      const queries = 'filter_approval=approved'
+  
+      await request(app)
+        .get('/v1/purchase/payment-order?' + queries)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .expect('Content-Type', /json/)
+        .expect(async (res) => {
+          const invoices = await paymentOrder.getInvoices();
+          const downPayments = await paymentOrder.getDownPayments();
+          const returns = await paymentOrder.getReturns();
+          const others = await paymentOrder.getOthers();
+          const form = await paymentOrder.getForm();
+          const supplier = await paymentOrder.getSupplier();
+  
+          expect(res.status).toEqual(httpStatus.OK);
+          expect(res.body).toMatchObject({
+            data: expect.any(Array),
+            meta: {
+              currentPage: expect.any(Number),
+              lastPage: expect.any(Number),
+              perPage: expect.any(Number),
+              total: 1
+            }
+          });
+          expect(res.body.data).toMatchObject([{
+            id: paymentOrder.id,
+            paymentType: paymentOrder.paymentType,
+            supplierId: paymentOrder.supplierId,
+            supplierName: paymentOrder.supplierName,
+            amount: paymentOrder.amount,
+            supplier: {
+              id: supplier.id,
+              code: supplier.code,
+              name: supplier.name,
+              address: supplier.address,
+              city: supplier.city,
+              state: supplier.state,
+              country: supplier.country,
+              phone: supplier.phone,
+              email: supplier.email
+            },
+            invoices: [
+              {
+                id: invoices[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: invoices[0].amount,
+                referenceableId: invoices[0].referenceableId,
+                referenceableType: invoices[0].referenceableType
+              }
+            ],
+            downPayments: [
+              {
+                id: downPayments[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: downPayments[0].amount,
+                referenceableId: downPayments[0].referenceableId,
+                referenceableType: downPayments[0].referenceableType
+              }
+            ],
+            returns: [
+              {
+                id: returns[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: returns[0].amount,
+                referenceableId: returns[0].referenceableId,
+                referenceableType: returns[0].referenceableType
+              }
+            ],
+            others: [
+              {
+                id: others[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                chartOfAccountId: others[0].coaId,
+                allocationId: others[0].allocationId,
+                amount: others[0].amount,
+                notes: others[0].notes
+              },
+              {
+                id: others[1].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                chartOfAccountId: others[1].coaId,
+                allocationId: others[1].allocationId,
+                amount: others[1].amount,
+                notes: others[1].notes
+              }
+            ],
+            form: {
+              id: form.id,
+              branchId: form.branchId,
+              date: form.date.toISOString(),
+              number: form.number,
+              editedNumber: form.editedNumber,
+              notes: form.notes,
+              editedNotes: form.editedNotes,
+              createdBy: form.createdBy,
+              updatedBy: form.updatedBy,
+              done: form.done,
+              incrementNumber: form.incrementNumber,
+              incrementGroup: form.incrementGroup,
+              formableId: form.formableId,
+              formableType: form.formableType,
+              requestApprovalTo: form.requestApprovalTo,
+              approvalBy: form.approvalBy,
+              approvalAt: form.approvalAt.toISOString(),
+              approvalReason: form.approvalReason,
+              approvalStatus: form.approvalStatus,
+              requestCancellationTo: form.requestCancellationTo,
+              requestCancellationBy: form.requestCancellationBy,
+              requestCancellationAt: form.requestCancellationAt,
+              requestCancellationReason: form.requestCancellationReason,
+              cancellationApprovalAt: form.cancellationApprovalAt,
+              cancellationApprovalBy: form.cancellationApprovalBy,
+              cancellationApprovalReason: form.cancellationApprovalReason,
+              cancellationStatus: form.cancellationStatus,
+            }
+          }]);
+        });
+    });
+
+    it('return form with status done', async () => {
+      const res = await request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(createFormRequestDto);
+      
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne({
+        where: { id: res.body.data.id }
+      });
+      const form = await paymentOrder.getForm();
+      await form.update({
+        done: true
+      });
+  
+      const queries = 'filter_form=done'
+  
+      await request(app)
+        .get('/v1/purchase/payment-order?' + queries)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .expect('Content-Type', /json/)
+        .expect(async (res) => {
+          const invoices = await paymentOrder.getInvoices();
+          const downPayments = await paymentOrder.getDownPayments();
+          const returns = await paymentOrder.getReturns();
+          const others = await paymentOrder.getOthers();
+          const form = await paymentOrder.getForm();
+          const supplier = await paymentOrder.getSupplier();
+  
+          expect(res.status).toEqual(httpStatus.OK);
+          expect(res.body).toMatchObject({
+            data: expect.any(Array),
+            meta: {
+              currentPage: expect.any(Number),
+              lastPage: expect.any(Number),
+              perPage: expect.any(Number),
+              total: 1
+            }
+          });
+          expect(res.body.data).toMatchObject([{
+            id: paymentOrder.id,
+            paymentType: paymentOrder.paymentType,
+            supplierId: paymentOrder.supplierId,
+            supplierName: paymentOrder.supplierName,
+            amount: paymentOrder.amount,
+            supplier: {
+              id: supplier.id,
+              code: supplier.code,
+              name: supplier.name,
+              address: supplier.address,
+              city: supplier.city,
+              state: supplier.state,
+              country: supplier.country,
+              phone: supplier.phone,
+              email: supplier.email
+            },
+            invoices: [
+              {
+                id: invoices[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: invoices[0].amount,
+                referenceableId: invoices[0].referenceableId,
+                referenceableType: invoices[0].referenceableType
+              }
+            ],
+            downPayments: [
+              {
+                id: downPayments[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: downPayments[0].amount,
+                referenceableId: downPayments[0].referenceableId,
+                referenceableType: downPayments[0].referenceableType
+              }
+            ],
+            returns: [
+              {
+                id: returns[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: returns[0].amount,
+                referenceableId: returns[0].referenceableId,
+                referenceableType: returns[0].referenceableType
+              }
+            ],
+            others: [
+              {
+                id: others[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                chartOfAccountId: others[0].coaId,
+                allocationId: others[0].allocationId,
+                amount: others[0].amount,
+                notes: others[0].notes
+              },
+              {
+                id: others[1].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                chartOfAccountId: others[1].coaId,
+                allocationId: others[1].allocationId,
+                amount: others[1].amount,
+                notes: others[1].notes
+              }
+            ],
+            form: {
+              id: form.id,
+              branchId: form.branchId,
+              date: form.date.toISOString(),
+              number: form.number,
+              editedNumber: form.editedNumber,
+              notes: form.notes,
+              editedNotes: form.editedNotes,
+              createdBy: form.createdBy,
+              updatedBy: form.updatedBy,
+              done: form.done,
+              incrementNumber: form.incrementNumber,
+              incrementGroup: form.incrementGroup,
+              formableId: form.formableId,
+              formableType: form.formableType,
+              requestApprovalTo: form.requestApprovalTo,
+              approvalBy: form.approvalBy,
+              approvalAt: form.approvalAt.toISOString(),
+              approvalReason: form.approvalReason,
+              approvalStatus: form.approvalStatus,
+              requestCancellationTo: form.requestCancellationTo,
+              requestCancellationBy: form.requestCancellationBy,
+              requestCancellationAt: form.requestCancellationAt,
+              requestCancellationReason: form.requestCancellationReason,
+              cancellationApprovalAt: form.cancellationApprovalAt,
+              cancellationApprovalBy: form.cancellationApprovalBy,
+              cancellationApprovalReason: form.cancellationApprovalReason,
+              cancellationStatus: form.cancellationStatus,
+            }
+          }]);
+        });
+    });
+
+    it('return form with filter date', async () => {
+      createFormRequestDto.date = new Date('2022-11-01');
+      const res = await request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(createFormRequestDto);
+      
+      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne({
+        where: { id: res.body.data.id }
+      });
+      const form = await paymentOrder.getForm();
+      await form.update({
+        done: true
+      });
+  
+      const queries = 'filter_date_min=2022-11-01+00:00:00&filter_date_max=2022-11-30+23:59:59'
+  
+      await request(app)
+        .get('/v1/purchase/payment-order?' + queries)
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .expect('Content-Type', /json/)
+        .expect(async (res) => {
+          const invoices = await paymentOrder.getInvoices();
+          const downPayments = await paymentOrder.getDownPayments();
+          const returns = await paymentOrder.getReturns();
+          const others = await paymentOrder.getOthers();
+          const form = await paymentOrder.getForm();
+          const supplier = await paymentOrder.getSupplier();
+  
+          expect(res.status).toEqual(httpStatus.OK);
+          expect(res.body).toMatchObject({
+            data: expect.any(Array),
+            meta: {
+              currentPage: expect.any(Number),
+              lastPage: expect.any(Number),
+              perPage: expect.any(Number),
+              total: 1
+            }
+          });
+          expect(res.body.data).toMatchObject([{
+            id: paymentOrder.id,
+            paymentType: paymentOrder.paymentType,
+            supplierId: paymentOrder.supplierId,
+            supplierName: paymentOrder.supplierName,
+            amount: paymentOrder.amount,
+            supplier: {
+              id: supplier.id,
+              code: supplier.code,
+              name: supplier.name,
+              address: supplier.address,
+              city: supplier.city,
+              state: supplier.state,
+              country: supplier.country,
+              phone: supplier.phone,
+              email: supplier.email
+            },
+            invoices: [
+              {
+                id: invoices[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: invoices[0].amount,
+                referenceableId: invoices[0].referenceableId,
+                referenceableType: invoices[0].referenceableType
+              }
+            ],
+            downPayments: [
+              {
+                id: downPayments[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: downPayments[0].amount,
+                referenceableId: downPayments[0].referenceableId,
+                referenceableType: downPayments[0].referenceableType
+              }
+            ],
+            returns: [
+              {
+                id: returns[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                amount: returns[0].amount,
+                referenceableId: returns[0].referenceableId,
+                referenceableType: returns[0].referenceableType
+              }
+            ],
+            others: [
+              {
+                id: others[0].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                chartOfAccountId: others[0].coaId,
+                allocationId: others[0].allocationId,
+                amount: others[0].amount,
+                notes: others[0].notes
+              },
+              {
+                id: others[1].id,
+                purchasePaymentOrderId: paymentOrder.id,
+                chartOfAccountId: others[1].coaId,
+                allocationId: others[1].allocationId,
+                amount: others[1].amount,
+                notes: others[1].notes
+              }
+            ],
+            form: {
+              id: form.id,
+              branchId: form.branchId,
+              date: form.date.toISOString(),
+              number: form.number,
+              editedNumber: form.editedNumber,
+              notes: form.notes,
+              editedNotes: form.editedNotes,
+              createdBy: form.createdBy,
+              updatedBy: form.updatedBy,
+              done: form.done,
+              incrementNumber: form.incrementNumber,
+              incrementGroup: form.incrementGroup,
+              formableId: form.formableId,
+              formableType: form.formableType,
+              requestApprovalTo: form.requestApprovalTo,
+              approvalBy: form.approvalBy,
+              approvalAt: form.approvalAt.toISOString(),
+              approvalReason: form.approvalReason,
+              approvalStatus: form.approvalStatus,
+              requestCancellationTo: form.requestCancellationTo,
+              requestCancellationBy: form.requestCancellationBy,
+              requestCancellationAt: form.requestCancellationAt,
+              requestCancellationReason: form.requestCancellationReason,
+              cancellationApprovalAt: form.cancellationApprovalAt,
+              cancellationApprovalBy: form.cancellationApprovalBy,
+              cancellationApprovalReason: form.cancellationApprovalReason,
+              cancellationStatus: form.cancellationStatus,
+            }
+          }]);
+        });
     });
 })
 
