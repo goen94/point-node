@@ -75,7 +75,7 @@ describe('Payment Order - FindAll', () => {
             meta: {
               currentPage: expect.any(Number),
               lastPage: expect.any(Number),
-              perPage: expect.any(Number),
+              perPage: 10,
               total: 2
             }
           });
@@ -311,7 +311,7 @@ describe('Payment Order - FindAll', () => {
             meta: {
               currentPage: expect.any(Number),
               lastPage: expect.any(Number),
-              perPage: expect.any(Number),
+              perPage: 10,
               total: 2
             }
           });
@@ -534,7 +534,7 @@ describe('Payment Order - FindAll', () => {
             meta: {
               currentPage: expect.any(Number),
               lastPage: expect.any(Number),
-              perPage: expect.any(Number),
+              perPage: 10,
               total: 1
             }
           });
@@ -670,7 +670,7 @@ describe('Payment Order - FindAll', () => {
             meta: {
               currentPage: expect.any(Number),
               lastPage: expect.any(Number),
-              perPage: expect.any(Number),
+              perPage: 10,
               total: 1
             }
           });
@@ -806,7 +806,7 @@ describe('Payment Order - FindAll', () => {
             meta: {
               currentPage: expect.any(Number),
               lastPage: expect.any(Number),
-              perPage: expect.any(Number),
+              perPage: 10,
               total: 1
             }
           });
@@ -943,7 +943,7 @@ describe('Payment Order - FindAll', () => {
             meta: {
               currentPage: expect.any(Number),
               lastPage: expect.any(Number),
-              perPage: expect.any(Number),
+              perPage: 10,
               total: 1
             }
           });
