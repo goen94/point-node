@@ -31,9 +31,9 @@ describe('Purchase Return - DeleteFormRequest', () => {
   });
 
   it('success delete', async (done) => {
-    const mailerSpy = jest.spyOn(ProcessSendDeleteApproval.prototype, 'call').mockReturnValue(true);
-
+    const { maker } = recordFactories;
     const purchaseReturn = await tenantDatabase.PurchaseReturn.findOne();
+    const purchaseReturnForm = await purchaseReturn.getForm();
 
     const deleteFormRequestDto = {
       reason: faker.datatype.string(20),
@@ -46,14 +46,15 @@ describe('Purchase Return - DeleteFormRequest', () => {
       .set('Content-Type', 'application/json')
       .send(deleteFormRequestDto)
       .expect(async (res) => {
+        const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
         expect(res.status).toEqual(httpStatus.NO_CONTENT);
-        expect(mailerSpy).toHaveBeenCalled();
 
         const form = await purchaseReturn.getForm();
         expect(form.cancellationStatus).toBe(0);
-        expect(form.done).toBe(false);
-        expect(form.formableId).toBe(purchaseReturn.id);
-        expect(form.formableType).toBe('PurchaseReturn');
+        expect(form.requestCancellationTo).toBe(purchaseReturnForm.requestApprovalTo);
+        expect(form.requestCancellationBy).toBe(maker.id);
+        expect(form.requestCancellationAt).toBe(expect.stringMatching(isoPattern));
+        expect(form.requestCancellationReason).toBe(deleteFormRequestDto.reason);
       })
       .end(done);
   });

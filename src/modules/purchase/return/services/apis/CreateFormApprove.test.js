@@ -159,6 +159,20 @@ describe('Purchase Return - CreateFormApprove', () => {
           });
         }
 
+        const inventory = await tenantDatabase.Inventory.findOne({
+          where: {
+            formId: purchaseReturnForm.id,
+            itemId: purchaseReturnItems[0].id
+          }
+        });
+
+        expect(inventory).toMatchObject({
+          formId: purchaseReturnForm.id,
+          warehouseId: purchaseReturn.warehouseId,
+          itemId: purchaseReturnItems[0].id,
+          quantity: purchaseReturnItems[0].quantity + '.000000000000000000000000000000'
+        });
+
         const updatedStock = await new GetCurrentStock(tenantDatabase, {
           item: item,
           date: form.date,

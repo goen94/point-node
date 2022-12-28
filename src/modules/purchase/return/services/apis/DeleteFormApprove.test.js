@@ -51,91 +51,99 @@ describe('Purchase Return - DeleteFormApprove', () => {
     await request(app)
       .post('/v1/purchase/return/' + purchaseReturn.id + '/approve')
       .set('Authorization', 'Bearer '+ jwtoken)
+      .set('Tenant', 'test_dev');
+
+    await form.reload();
+    await form.update({
+      cancellationStatus: 0,
+      requestCancellationTo: approver.id
+    });
+    await request(app)
+      .post('/v1/purchase/return/' + purchaseReturn.id + '/cancellation-approve')
+      .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
-      .expect(async () => {
+      .expect(async (res) => {
         await form.reload();
-        await form.update({
-          cancellationStatus: 0,
-          requestCancellationTo: approver.id
+        const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+        expect(res.status).toEqual(httpStatus.OK);
+        expect(res.body.data).toMatchObject({
+          id: purchaseReturn.id,
+          purchaseInvoiceId: purchaseReturn.purchaseInvoiceId,
+          warehouseId: purchaseReturn.warehouseId,
+          supplierId: purchaseReturn.supplierId,
+          supplierName: purchaseReturn.supplierName,
+          supplierAddress: purchaseReturn.supplierAddress,
+          supplierPhone: purchaseReturn.supplierPhone,
+          amount: purchaseReturn.amount,
+          tax: purchaseReturn.tax,
+          form: {
+            id: form.id,
+            branchId: form.branchId,
+            date: form.date.toISOString(),
+            number: form.number,
+            editedNumber: form.editedNumber,
+            notes: form.notes,
+            editedNotes: form.editedNotes,
+            createdBy: form.createdBy,
+            updatedBy: form.updatedBy,
+            done: form.done,
+            incrementNumber: form.incrementNumber,
+            incrementGroup: form.incrementGroup,
+            formableId: form.formableId,
+            formableType: form.formableType,
+            requestApprovalTo: form.requestApprovalTo,
+            approvalBy: form.approvalBy,
+            approvalAt: form.approvalAt,
+            approvalReason: form.approvalReason,
+            approvalStatus: form.approvalStatus,
+            requestCancellationTo: form.requestCancellationTo,
+            requestCancellationBy: form.requestCancellationBy,
+            requestCancellationAt: form.requestCancellationAt,
+            requestCancellationReason: form.requestCancellationReason,
+            cancellationApprovalAt: expect.stringMatching(isoPattern),
+            cancellationApprovalBy: approver.id,
+            cancellationApprovalReason: form.cancellationApprovalReason,
+            cancellationStatus: 1,
+          }
         });
-        await request(app)
-          .post('/v1/purchase/return/' + purchaseReturn.id + '/cancellation-approve')
-          .set('Authorization', 'Bearer '+ jwtoken)
-          .set('Tenant', 'test_dev')
-          .expect(async (res) => {
-            await form.reload();
-            const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
-            expect(res.status).toEqual(httpStatus.OK);
-            expect(res.body.data).toMatchObject({
-              id: purchaseReturn.id,
-              purchaseInvoiceId: purchaseReturn.purchaseInvoiceId,
-              warehouseId: purchaseReturn.warehouseId,
-              supplierId: purchaseReturn.supplierId,
-              supplierName: purchaseReturn.supplierName,
-              supplierAddress: purchaseReturn.supplierAddress,
-              supplierPhone: purchaseReturn.supplierPhone,
-              amount: purchaseReturn.amount,
-              tax: purchaseReturn.tax,
-              form: {
-                id: form.id,
-                branchId: form.branchId,
-                date: form.date.toISOString(),
-                number: form.number,
-                editedNumber: form.editedNumber,
-                notes: form.notes,
-                editedNotes: form.editedNotes,
-                createdBy: form.createdBy,
-                updatedBy: form.updatedBy,
-                done: form.done,
-                incrementNumber: form.incrementNumber,
-                incrementGroup: form.incrementGroup,
-                formableId: form.formableId,
-                formableType: form.formableType,
-                requestApprovalTo: form.requestApprovalTo,
-                approvalBy: form.approvalBy,
-                approvalAt: form.approvalAt,
-                approvalReason: form.approvalReason,
-                approvalStatus: form.approvalStatus,
-                requestCancellationTo: form.requestCancellationTo,
-                requestCancellationBy: form.requestCancellationBy,
-                requestCancellationAt: form.requestCancellationAt,
-                requestCancellationReason: form.requestCancellationReason,
-                cancellationApprovalAt: expect.stringMatching(isoPattern),
-                cancellationApprovalBy: approver.id,
-                cancellationApprovalReason: form.cancellationApprovalReason,
-                cancellationStatus: 1,
-              }
-            });
 
-            const purchaseReturnForm = await tenantDatabase.Form.findOne({
-              where: { id: res.body.data.form.id }
-            });
-            expect(purchaseReturnForm).toMatchObject({
-              cancellationStatus: 1,
-              cancellationApprovalAt: expect.stringMatching(isoPattern),
-              cancellationApprovalBy: approver.id,
-            });
+        const purchaseReturnForm = await tenantDatabase.Form.findOne({
+          where: { id: res.body.data.form.id }
+        });
+        expect(purchaseReturnForm).toMatchObject({
+          cancellationStatus: 1,
+          cancellationApprovalAt: expect.stringMatching(isoPattern),
+          cancellationApprovalBy: approver.id,
+        });
 
-            const activity = await tenantDatabase.UserActivity.findOne({
-              where: {
-                number: purchaseReturnForm.number,
-                activity: 'Cancellation Approved',
-              }
-            })
-            expect(activity).toBeDefined();
+        const activity = await tenantDatabase.UserActivity.findOne({
+          where: {
+            number: purchaseReturnForm.number,
+            activity: 'Cancellation Approved',
+          }
+        })
+        expect(activity).toBeDefined();
 
-            const updatedStock = await new GetCurrentStock(tenantDatabase, {
-              item: item,
-              date: form.date,
-              warehouseId: purchaseReturn.warehouseId,
-              options: {
-                expiryDate: purchaseReturnItem[0].expiryDate,
-                productionNumber: purchaseReturnItem[0].productionNumber,
-              },
-            }).call();
-            expect(currentStock).toBe(updatedStock);
+        const purchaseReturnItems = await purchaseReturn.getItems();
+        const inventory = await tenantDatabase.Inventory.findOne({
+          where: {
+            formId: purchaseReturnForm.id,
+            itemId: purchaseReturnItems[0].id
+          }
+        });
 
-          });
+        expect(inventory).toBeUndefined();
+
+        const updatedStock = await new GetCurrentStock(tenantDatabase, {
+          item: item,
+          date: form.date,
+          warehouseId: purchaseReturn.warehouseId,
+          options: {
+            expiryDate: purchaseReturnItem[0].expiryDate,
+            productionNumber: purchaseReturnItem[0].productionNumber,
+          },
+        }).call();
+        expect(currentStock).toBe(updatedStock);
       });
   });
 

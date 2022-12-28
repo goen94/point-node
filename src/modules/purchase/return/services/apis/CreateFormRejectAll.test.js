@@ -124,6 +124,15 @@ describe('Purchase Return - CreateFormRejectAll', () => {
           });
           expect(journalInventory).toBeUndefined();
         }
+
+        const inventory = await tenantDatabase.Inventory.findOne({
+          where: {
+            formId: purchaseReturnForm.id,
+            itemId: purchaseReturnItems[0].id
+          }
+        });
+
+        expect(inventory).toBeUndefined();
       });
   });
 
