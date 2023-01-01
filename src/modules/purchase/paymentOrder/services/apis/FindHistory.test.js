@@ -50,49 +50,47 @@ describe('Payment Order - FindHistory', () => {
       .end(done);
   });
 
-  it('check return date and user', async (done) => {
+  it('check return date and user', async () => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
     const form = await paymentOrder.getForm();
 
-    request(app)
+    const res = await request(app)
       .get('/v1/purchase/payment-order/' + paymentOrder.id + 'histories')
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
-      .expect('Content-Type', /json/)
-      .expect(async (res) => {
-        const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
-        const user = await tenantDatabase.User.findOne({
-          where: { id: form.createdBy }
-        })
+      .expect('Content-Type', /json/);
+    
+    const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+    const user = await tenantDatabase.User.findOne({
+      where: { id: form.createdBy }
+    })
 
-        expect(res.status).toEqual(httpStatus.OK);
-        expect(res.body).toMatchObject({
-          data: expect.any(Array),
-          meta: {
-            currentPage: expect.any(Number),
-            lastPage: expect.any(Number),
-            perPage: expect.any(Number),
-            total: expect.any(Number)
-          }
-        });
-        expect(res.body.data[0]).toMatchObject({
-          id: expect.any(Number),
-          tableType: 'PurchasePaymentOrder',
-          tableId: paymentOrder.id,
-          number: form.number,
-          date: expect.stringMatching(isoPattern),
-          userId: form.createdBy,
-          activity: 'Created',
-          formableId: paymentOrder.id,
-          user: {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            fullName: user.fullName
-          }
-        });
-      })
-      .end(done);
+    expect(res.status).toEqual(httpStatus.OK);
+    expect(res.body).toMatchObject({
+      data: expect.any(Array),
+      meta: {
+        currentPage: expect.any(Number),
+        lastPage: expect.any(Number),
+        perPage: expect.any(Number),
+        total: expect.any(Number)
+      }
+    });
+    expect(res.body.data[0]).toMatchObject({
+      id: expect.any(Number),
+      tableType: 'PurchasePaymentOrder',
+      tableId: paymentOrder.id,
+      number: form.number,
+      date: expect.stringMatching(isoPattern),
+      userId: form.createdBy,
+      activity: 'Created',
+      formableId: paymentOrder.id,
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        fullName: user.fullName
+      }
+    });
   })
 });
 

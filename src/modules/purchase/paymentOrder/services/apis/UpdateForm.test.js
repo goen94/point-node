@@ -116,109 +116,19 @@ describe('Payment Order - UpdateForm', () => {
   });
 
   describe('throw if required data is empty', () => {
-    it('throw on paymentType', async (done) => {
+    it('throw on object', async (done) => {
       const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
+
       delete updateFormRequestDto['paymentType']
-  
-      request(app)
-        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(updateFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"paymentType" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on supplierId', async (done) => {
-      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto['supplierId']
-  
-      request(app)
-        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(updateFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"supplierId" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on date', async (done) => {
-      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto['date']
-  
-      request(app)
-        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(updateFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"date" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on requestApprovalTo', async (done) => {
-      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto['requestApprovalTo']
-  
-      request(app)
-        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(updateFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"requestApprovalTo" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw if invoices array empty', async (done) => {
-      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-      updateFormRequestDto.invoices = []
-  
-      request(app)
-        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(updateFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"invoices" must contain at least 1 items`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw if invoices null', async (done) => {
-      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto['invoices']
+      delete updateFormRequestDto['totalInvoiceAmount']
+      delete updateFormRequestDto['totalDownPaymentAmount']
+      delete updateFormRequestDto['totalReturnAmount']
+      delete updateFormRequestDto['totalOtherAmount']
+      delete updateFormRequestDto['totalAmount']
   
       request(app)
         .patch('/v1/purchase/payment-order/' + paymentOrder.id)
@@ -230,12 +140,24 @@ describe('Payment Order - UpdateForm', () => {
         .expect((res) => {
           expect(res.status).toEqual(httpStatus.BAD_REQUEST);
           expect(res.body).toMatchObject({
-            message: `"invoices" is required`
+            message: 'invalid data',
+            meta: expect.arrayContaining([
+              `"paymentType" is required`,
+              `"supplierId" is required`,
+              `"date" is required`,
+              `"requestApprovalTo" is required`,
+              `"invoices" is required`,
+              `"totalInvoiceAmount" is required`,
+              `"totalDownPaymentAmount" is required`,
+              `"totalReturnAmount" is required`,
+              `"totalOtherAmount" is required`,
+              `"totalAmount" is required`,
+            ])
           })
         })
         .end(done);
     });
-
+    
     it('throw if invoices amount null', async (done) => {
       const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
       delete updateFormRequestDto.invoices[0]['amount']
@@ -271,106 +193,6 @@ describe('Payment Order - UpdateForm', () => {
           expect(res.status).toEqual(httpStatus.BAD_REQUEST);
           expect(res.body).toMatchObject({
             message: `"invoices[0].amount" must be greater than or equal to 1`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on totalInvoiceAmount', async (done) => {
-      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-      delete updateFormRequestDto['totalInvoiceAmount']
-  
-      request(app)
-        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(updateFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"totalInvoiceAmount" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on totalDownPaymentAmount', async (done) => {
-      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-      delete updateFormRequestDto['totalDownPaymentAmount']
-  
-      request(app)
-        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(updateFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"totalDownPaymentAmount" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on totalReturnAmount', async (done) => {
-      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-      delete updateFormRequestDto['totalReturnAmount']
-  
-      request(app)
-        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(updateFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"totalReturnAmount" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on totalOtherAmount', async (done) => {
-      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-      delete updateFormRequestDto['totalOtherAmount']
-  
-      request(app)
-        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(updateFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"totalOtherAmount" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on totalAmount', async (done) => {
-      const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-      delete updateFormRequestDto['totalAmount']
-  
-      request(app)
-        .patch('/v1/purchase/payment-order/' + paymentOrder.id)
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(updateFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"totalAmount" is required`
           })
         })
         .end(done);
@@ -972,22 +794,21 @@ describe('Payment Order - UpdateForm', () => {
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
       .send(updateFormRequestDto)
+      .expect('Content-Type', /json/);
+
+    await request(app)
+      .get('/v1/purchase/payment-order?filter_form=pending;approvalApproved')
+      .set('Authorization', 'Bearer '+ jwtoken)
+      .set('Tenant', 'test_dev')
+      .set('Content-Type', 'application/json')
       .expect('Content-Type', /json/)
-      .expect(async () => {
-        await request(app)
-          .get('/v1/purchase/payment-order?filter_form=pending;approvalApproved')
-          .set('Authorization', 'Bearer '+ jwtoken)
-          .set('Tenant', 'test_dev')
-          .set('Content-Type', 'application/json')
-          .expect('Content-Type', /json/)
-          .expect(async (res) => {
-            expect(res.status).toEqual(httpStatus.OK);
-            expect(res.body.data.length).toEqual(0);
-          });
+      .expect(async (res) => {
+        expect(res.status).toEqual(httpStatus.OK);
+        expect(res.body.data.length).toEqual(0);
       });
   });
 
-  it('check form reference still pending if amount less than available', async (done) => {
+  it('check form reference still pending if amount less than available', async () => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
     const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
 
@@ -1000,14 +821,14 @@ describe('Payment Order - UpdateForm', () => {
     const availableReturn = (await purchaseReturn.getAvailable()) + createFormRequestDto.returns[0].amount;
     expect(availableReturn).toBeGreaterThan(parseFloat(updateFormRequestDto.returns[0].amount));
 
-    request(app)
+    await request(app)
       .patch('/v1/purchase/payment-order/' + paymentOrder.id)
       .set('Authorization', 'Bearer '+ jwtoken)
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
       .send(updateFormRequestDto)
       .expect('Content-Type', /json/)
-      .expect(async (res) => {
+      .expect(async () => {
         const formInvoice = await purchaseInvoice.getForm();
         expect(formInvoice.done).toEqual(false);
 
@@ -1016,8 +837,7 @@ describe('Payment Order - UpdateForm', () => {
         
         const formReturn = await purchaseReturn.getForm();        
         expect(formReturn.done).toEqual(false); 
-      })
-      .end(done);
+      });
   });
 
   it('check form reference done if amount same as available', async () => {

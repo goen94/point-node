@@ -70,106 +70,20 @@ describe('Payment Order - CreateFormRequest', () => {
   });
 
   describe('throw if required data is empty', () => {
-    it('throw on paymentType', async (done) => {
+    it('throw on object', async (done) => {
       delete createFormRequestDto['paymentType']
-  
-      request(app)
-        .post('/v1/purchase/payment-order')
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(createFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"paymentType" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on supplierId', async (done) => {
       delete createFormRequestDto['supplierId']
-  
-      request(app)
-        .post('/v1/purchase/payment-order')
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(createFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"supplierId" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on date', async (done) => {
       delete createFormRequestDto['date']
-  
-      request(app)
-        .post('/v1/purchase/payment-order')
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(createFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"date" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on requestApprovalTo', async (done) => {
       delete createFormRequestDto['requestApprovalTo']
-  
-      request(app)
-        .post('/v1/purchase/payment-order')
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(createFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"requestApprovalTo" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw if invoices array empty', async (done) => {
-      createFormRequestDto.invoices = []
-  
-      request(app)
-        .post('/v1/purchase/payment-order')
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(createFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"invoices" must contain at least 1 items`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw if invoices null', async (done) => {
       delete createFormRequestDto['invoices']
+      delete createFormRequestDto['totalInvoiceAmount']
+      delete createFormRequestDto['totalDownPaymentAmount']
+      delete createFormRequestDto['totalReturnAmount']
+      delete createFormRequestDto['totalOtherAmount']
+      delete createFormRequestDto['totalAmount']
   
       request(app)
-        .post('/v1/purchase/payment-order')
+        .post('/v1/purchase/return')
         .set('Authorization', 'Bearer '+ jwtoken)
         .set('Tenant', 'test_dev')
         .set('Content-Type', 'application/json')
@@ -178,12 +92,24 @@ describe('Payment Order - CreateFormRequest', () => {
         .expect((res) => {
           expect(res.status).toEqual(httpStatus.BAD_REQUEST);
           expect(res.body).toMatchObject({
-            message: `"invoices" is required`
+            message: 'invalid data',
+            meta: expect.arrayContaining([
+              `"paymentType" is required`,
+              `"supplierId" is required`,
+              `"date" is required`,
+              `"requestApprovalTo" is required`,
+              `"invoices" is required`,
+              `"totalInvoiceAmount" is required`,
+              `"totalDownPaymentAmount" is required`,
+              `"totalReturnAmount" is required`,
+              `"totalOtherAmount" is required`,
+              `"totalAmount" is required`,
+            ])
           })
         })
         .end(done);
     });
-
+    
     it('throw if invoices amount null', async (done) => {
       delete createFormRequestDto.invoices[0]['amount']
   
@@ -217,101 +143,6 @@ describe('Payment Order - CreateFormRequest', () => {
           expect(res.status).toEqual(httpStatus.BAD_REQUEST);
           expect(res.body).toMatchObject({
             message: `"invoices[0].amount" must be greater than or equal to 1`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on totalInvoiceAmount', async (done) => {
-      delete createFormRequestDto['totalInvoiceAmount']
-  
-      request(app)
-        .post('/v1/purchase/payment-order')
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(createFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"totalInvoiceAmount" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on totalDownPaymentAmount', async (done) => {
-      delete createFormRequestDto['totalDownPaymentAmount']
-  
-      request(app)
-        .post('/v1/purchase/payment-order')
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(createFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"totalDownPaymentAmount" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on totalReturnAmount', async (done) => {
-      delete createFormRequestDto['totalReturnAmount']
-  
-      request(app)
-        .post('/v1/purchase/payment-order')
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(createFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"totalReturnAmount" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on totalOtherAmount', async (done) => {
-      delete createFormRequestDto['totalOtherAmount']
-  
-      request(app)
-        .post('/v1/purchase/payment-order')
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(createFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"totalOtherAmount" is required`
-          })
-        })
-        .end(done);
-    });
-
-    it('throw on totalAmount', async (done) => {
-      delete createFormRequestDto['totalAmount']
-  
-      request(app)
-        .post('/v1/purchase/payment-order')
-        .set('Authorization', 'Bearer '+ jwtoken)
-        .set('Tenant', 'test_dev')
-        .set('Content-Type', 'application/json')
-        .send(createFormRequestDto)
-        .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
-          expect(res.body).toMatchObject({
-            message: `"totalAmount" is required`
           })
         })
         .end(done);

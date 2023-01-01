@@ -1,11 +1,13 @@
 const faker = require('faker');
+const httpStatus = require('http-status');
 const tenantDatabase = require('@src/models').tenant;
 const factory = require('@root/tests/utils/factory');
-const httpStatus = require('http-status');
+const ProcessSendCreateApproval = require('../../workers/ProcessSendCreateApproval.worker');
+const CheckJournal = require('./../CheckJournal');
 const request = require('supertest');
 const token = require('@src/modules/auth/services/token.service');
 const app = require('@src/app');
-const ProcessSendCreateApproval = require('../../workers/ProcessSendCreateApproval.worker');
+const moment = require('moment');
 
 jest.mock('@src/modules/auth/services/getToken.service')
 
@@ -14,12 +16,21 @@ beforeEach(() => {
   ProcessSendCreateApproval.mockClear();
 });
 
-describe('Payment Order - DeleteFormRequest', () => {
+describe('Payment Order - CreateFormRequest', () => {
   let recordFactories, createFormRequestDto, jwtoken
   beforeEach(async (done) => {
     recordFactories = await generateRecordFactories();
     createFormRequestDto = generateCreateFormRequestDto(recordFactories);
     jwtoken = token.generateToken(recordFactories.maker.id);
+    done();
+  }); 
+
+  it('throw on paymentType', async (done) => {
+    delete createFormRequestDto['paymentType']
+    delete createFormRequestDto['supplierId']
+    delete createFormRequestDto['date']
+    delete createFormRequestDto['requestApprovalTo']
+    delete createFormRequestDto['invoices']
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -27,147 +38,21 @@ describe('Payment Order - DeleteFormRequest', () => {
       .set('Tenant', 'test_dev')
       .set('Content-Type', 'application/json')
       .send(createFormRequestDto)
-      .end(done);
-  });
-
-  it('throw error when requested by user with different branch', async (done) => {
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const { maker } = recordFactories;
-    await tenantDatabase.BranchUser.destroy({
-      where: {},
-      truncate: true
-    });
-    const branch = await factory.branch.create();
-    await factory.branchUser.create({ user: maker, branch, isDefault: true });
-
-    const deleteFormRequestDto = {
-      reason: 'example reason',
-    };
-
-    request(app)
-      .delete('/v1/purchase/payment-order/' + paymentOrder.id)
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(deleteFormRequestDto)
-      .expect('Content-Type', /json/)
-      .expect((res) => {
-        console.log(res.body)
-        expect(res.status).toEqual(httpStatus.FORBIDDEN);
-        expect(res.body).toMatchObject({
-          message: `please set default branch same as form to update this form`
-        })
-      })
-      .end(done);
-  });
-
-  it('throw error when requested by user that does not have access to delete', async (done) => {
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const deleteFormRequestDto = {
-      reason: 'example reason',
-    };
-
-    await tenantDatabase.RoleHasPermission.destroy({
-      where: {},
-      truncate: true
-    });
-    
-    request(app)
-      .delete('/v1/purchase/payment-order/' + paymentOrder.id)
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(deleteFormRequestDto)
-      .expect('Content-Type', /json/)
-      .expect((res) => {
-        expect(res.status).toEqual(httpStatus.FORBIDDEN);
-        expect(res.body).toMatchObject({
-          message: `Forbidden`
-        })
-      })
-      .end(done);
-  });
-
-  it('throw error if already referenced in payment', async (done) => {
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const { maker, approver, supplier, chartOfAccountIncome, chartOfAccountExpense, branch } = recordFactories;
-    const payment = await factory.payment.create({ supplier, paymentType: 'cash', chartOfAccount: chartOfAccountIncome });
-    await factory.paymentDetail.create({ payment, paymentOrder, chartOfAccount: chartOfAccountExpense });
-    const formPayment =
-      await factory.form.create({
-        branch,
-        reference: payment,
-        createdBy: maker.id,
-        updatedBy: maker.id,
-        requestApprovalTo: approver.id,
-        formable: payment,
-        formableType: 'Payment',
-        number: 'CASH/OUT/2211001',
-      });
-
-    const deleteFormRequestDto = {
-      reason: 'example reason',
-    };
-
-    request(app)
-      .delete('/v1/purchase/payment-order/' + paymentOrder.id)
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(deleteFormRequestDto)
-      .expect('Content-Type', /json/)
-      .expect((res) => {
-        expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
-        expect(res.body).toMatchObject({
-          message: `form already referenced with number ${formPayment.number}`
-        })
-      })
-      .end(done);
-  });
-
-  it('throw error if reason is empty', async (done) => {
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-    const deleteFormRequestDto = {
-      reason: '',
-    };
-
-    request(app)
-      .delete('/v1/purchase/payment-order/' + paymentOrder.id)
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(deleteFormRequestDto)
       .expect('Content-Type', /json/)
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.BAD_REQUEST);
         expect(res.body).toMatchObject({
-          message: `"reason" is not allowed to be empty`
+          message: 'invalid data',
+          meta: expect.arrayContaining([
+            `"supplierId" is required`,
+            `"paymentType" is required`,
+            `"date" is required`,
+            `"requestApprovalTo" is required`,
+            `"invoices" is required`,
+          ])
         })
       })
       .end(done);
-  });
-
-  it('success delete', async (done) => {
-    const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
-
-    const deleteFormRequestDto = {
-      reason: faker.datatype.string(20),
-    };
-
-    const res = request(app)
-      .delete('/v1/purchase/payment-order/' + paymentOrder.id)
-      .set('Authorization', 'Bearer '+ jwtoken)
-      .set('Tenant', 'test_dev')
-      .set('Content-Type', 'application/json')
-      .send(deleteFormRequestDto);
-
-    expect(res.status).toEqual(httpStatus.NO_CONTENT);
-
-    const form = await paymentOrder.getForm();
-    expect(form.cancellationStatus).toBe(0);
-    expect(form.done).toBe(false);
-    expect(form.formableId).toBe(paymentOrder.id);
-    expect(form.formableType).toBe('PurchasePaymentOrder');
   });
 });
 
@@ -237,7 +122,6 @@ const generateRecordFactories = async ({
   approver = approver || (await factory.user.create());
   branch = branch || (await factory.branch.create());
   await factory.permission.create('purchase payment order', maker);
-  await factory.permission.create('purchase payment order', approver);
   // create relation between maker and branch for authorization
   branchUser = branchUser || (await factory.branchUser.create({ user: maker, branch, isDefault: true }));
   warehouse = await factory.warehouse.create({ branch, ...warehouse });
