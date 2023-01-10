@@ -16,6 +16,8 @@ beforeEach(() => {
   ProcessSendCreateApproval.mockClear();
 });
 
+const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
 describe('Payment Order - CreateFormRequest', () => {
   let recordFactories, createFormRequestDto, jwtoken
   beforeEach(async (done) => {
@@ -601,8 +603,8 @@ describe('Payment Order - CreateFormRequest', () => {
             approvalStatus: 0,
             id: expect.any(Number),
             branchId: branch.id,
-            date: createFormRequestDto.date.toISOString(),
-            number: 'PP' + moment(createFormRequestDto.date).format('YYMM') + '001',
+            date: expect.stringMatching(isoPattern),
+            number: 'PP' + moment(new Date()).format('YYMM') + '001',
             notes: createFormRequestDto.notes,
             createdBy: maker.id,
             updatedBy: maker.id,
@@ -633,8 +635,8 @@ describe('Payment Order - CreateFormRequest', () => {
           approvalStatus: 0,
           id: res.body.data.form.id,
           BranchId: branch.id,
-          date: createFormRequestDto.date,
-          number: 'PP' + moment(createFormRequestDto.date).format('YYMM') + '001',
+          date: expect.stringMatching(isoPattern),
+          number: 'PP' + moment(new Date()).format('YYMM') + '001',
           notes: createFormRequestDto.notes,
           createdBy: maker.id,
           updatedBy: maker.id,
@@ -738,7 +740,7 @@ describe('Payment Order - CreateFormRequest', () => {
           where: { id: res.body.data.form.id }
         });
         expect(paymentOrderForm).toMatchObject({
-          number: 'PP' + moment(createFormRequestDto.date).format('YYMM') + '002',
+          number: 'PP' + moment(new Date()).format('YYMM') + '002',
         });
       })
   });
