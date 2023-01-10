@@ -652,7 +652,6 @@ const generateCreateFormRequestDto = ({
   paymentType: 'cash',
   supplierId: supplier.id || 1,
   supplierName: supplier.name || 'Supplier',
-  date: new Date('2022-12-03'),
   invoices: [{
     id: purchaseInvoice.id,
     amount: 100000

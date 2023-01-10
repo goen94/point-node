@@ -73,7 +73,6 @@ describe('Payment Order - CreateFormRequest', () => {
     it('throw on object', async (done) => {
       delete createFormRequestDto['paymentType']
       delete createFormRequestDto['supplierId']
-      delete createFormRequestDto['date']
       delete createFormRequestDto['requestApprovalTo']
       delete createFormRequestDto['invoices']
       delete createFormRequestDto['totalInvoiceAmount']
@@ -96,7 +95,6 @@ describe('Payment Order - CreateFormRequest', () => {
             meta: expect.arrayContaining([
               `"paymentType" is required`,
               `"supplierId" is required`,
-              `"date" is required`,
               `"requestApprovalTo" is required`,
               `"invoices" is required`,
               `"totalInvoiceAmount" is required`,
@@ -965,7 +963,6 @@ const generateCreateFormRequestDto = (recordFactories) => {
     paymentType: 'cash',
     supplierId: supplier.id || 1,
     supplierName: supplier.name || 'Supplier',
-    date: new Date('2022-12-03'),
     invoices: [{
       id: purchaseInvoice.id,
       amount: 100000
