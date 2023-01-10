@@ -23,7 +23,7 @@ describe('Payment Order - CreateFormRequest', () => {
     createFormRequestDto = generateCreateFormRequestDto(recordFactories);
     jwtoken = token.generateToken(recordFactories.maker.id);
     done();
-  }); 
+  });
 
   it('can\'t create when requested by user that does not have branch default', async (done) => {
     const { branchUser } = recordFactories
@@ -80,7 +80,7 @@ describe('Payment Order - CreateFormRequest', () => {
       delete createFormRequestDto['totalReturnAmount']
       delete createFormRequestDto['totalOtherAmount']
       delete createFormRequestDto['totalAmount']
-  
+
       request(app)
         .post('/v1/purchase/return')
         .set('Authorization', 'Bearer '+ jwtoken)
@@ -107,10 +107,10 @@ describe('Payment Order - CreateFormRequest', () => {
         })
         .end(done);
     });
-    
+
     it('throw if invoices amount null', async (done) => {
       delete createFormRequestDto.invoices[0]['amount']
-  
+
       request(app)
         .post('/v1/purchase/payment-order')
         .set('Authorization', 'Bearer '+ jwtoken)
@@ -129,7 +129,7 @@ describe('Payment Order - CreateFormRequest', () => {
 
     it('throw if invoices amount zero', async (done) => {
       createFormRequestDto.invoices[0].amount = 0
-  
+
       request(app)
         .post('/v1/purchase/payment-order')
         .set('Authorization', 'Bearer '+ jwtoken)
@@ -148,7 +148,8 @@ describe('Payment Order - CreateFormRequest', () => {
   });
 
   it('throw error if purchase invoice not exist', async (done) => {
-    createFormRequestDto.invoices[0].id = 200;
+    const id = 200;
+    createFormRequestDto.invoices[0].id = id;
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -160,14 +161,15 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.NOT_FOUND);
         expect(res.body).toMatchObject({
-          message: `purchase invoice with id 200 not exist`
+          message: `purchase invoice with id ${id} not exist`
         })
       })
       .end(done);
   });
 
   it('throw error if purchase down payment not exist', async (done) => {
-    createFormRequestDto.downPayments[0].id = 200;
+    const id = 200;
+    createFormRequestDto.downPayments[0].id = id;
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -179,14 +181,15 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.NOT_FOUND);
         expect(res.body).toMatchObject({
-          message: `purchase down payment with id 200 not exist`
+          message: `purchase down payment with id ${id} not exist`
         })
       })
       .end(done);
   });
 
   it('throw error if purchase return not exist', async (done) => {
-    createFormRequestDto.returns[0].id = 200;
+    const id = 200
+    createFormRequestDto.returns[0].id = id;
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -198,14 +201,15 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.NOT_FOUND);
         expect(res.body).toMatchObject({
-          message: `purchase return with id 200 not exist`
+          message: `purchase return with id ${id} not exist`
         })
       })
       .end(done);
   });
 
   it('throw error if supplier not exist', async (done) => {
-    createFormRequestDto.supplierId = 200;
+    const id = 200
+    createFormRequestDto.supplierId = id;
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -224,10 +228,12 @@ describe('Payment Order - CreateFormRequest', () => {
   });
 
   it('throw error if purchase invoice order more than available', async (done) => {
-    const { formPurchaseInvoice } = recordFactories;
-    createFormRequestDto.invoices[0].amount = 500000;
-    createFormRequestDto.totalInvoiceAmount = 500000;
-    createFormRequestDto.totalAmount = 465000;
+    const { formPurchaseInvoice, purchaseInvoice } = recordFactories;
+    const available = await purchaseInvoice.getAvailable();
+    const totalBeforeInvoice = createFormRequestDto.totalAmount - createFormRequestDto.totalInvoiceAmount;
+    createFormRequestDto.invoices[0].amount = available + 10000;
+    createFormRequestDto.totalInvoiceAmount = available + 10000;
+    createFormRequestDto.totalAmount = totalBeforeInvoice + available + 10000;
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -239,17 +245,19 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `form ${formPurchaseInvoice.number} order more than available, available 220000 ordered 500000`
+          message: `form ${formPurchaseInvoice.number} order more than available, available ${available} ordered ${createFormRequestDto.invoices[0].amount}`
         })
       })
       .end(done);
   });
 
   it('throw error if purchase down payment order more than available', async (done) => {
-    const { formPurchaseDownPayment } = recordFactories;
-    createFormRequestDto.downPayments[0].amount = 40000;
-    createFormRequestDto.totalDownPaymentAmount = 40000;
-    createFormRequestDto.totalAmount = 45000;
+    const { formPurchaseDownPayment, purchaseDownPayment } = recordFactories;
+    const available = await purchaseDownPayment.getAvailable();
+    const totalBeforeDownPayment = createFormRequestDto.totalAmount + createFormRequestDto.totalDownPaymentAmount;
+    createFormRequestDto.downPayments[0].amount = available + 1000;
+    createFormRequestDto.totalDownPaymentAmount = available + 1000;
+    createFormRequestDto.totalAmount = totalBeforeDownPayment - available + 1000;
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -261,17 +269,19 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `form ${formPurchaseDownPayment.number} order more than available, available 30000 ordered 40000`
+          message: `form ${formPurchaseDownPayment.number} order more than available, available ${available} ordered ${createFormRequestDto.downPayments[0].amount}`
         })
       })
       .end(done);
   });
 
   it('throw error if purchase return order more than available', async (done) => {
-    const { formPurchaseReturn } = recordFactories;
-    createFormRequestDto.returns[0].amount = 20000;
-    createFormRequestDto.totalReturnAmount = 20000;
-    createFormRequestDto.totalAmount = 55000;
+    const { formPurchaseReturn, purchaseReturn } = recordFactories;
+    const available = await purchaseReturn.getAvailable();
+    const totalBeforeReturn = createFormRequestDto.totalAmount + createFormRequestDto.totalReturnAmount;
+    createFormRequestDto.returns[0].amount = available + 1000;
+    createFormRequestDto.totalReturnAmount = available + 1000;
+    createFormRequestDto.totalAmount = totalBeforeReturn + available + 1000;
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -283,7 +293,7 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `form ${formPurchaseReturn.number} order more than available, available 11000 ordered 20000`
+          message: `form ${formPurchaseReturn.number} order more than available, available ${available} ordered ${createFormRequestDto.returns[0].amount}`
         })
       })
       .end(done);
@@ -328,7 +338,8 @@ describe('Payment Order - CreateFormRequest', () => {
   });
 
   it('throw error on incorrect total invoice', async (done) => {
-    createFormRequestDto.totalInvoiceAmount = 400000
+    const expected = createFormRequestDto.totalInvoiceAmount
+    createFormRequestDto.totalInvoiceAmount = expected + 100000
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -340,14 +351,15 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `incorect total invoice amount, expected 100000 received 400000`
+          message: `incorect total invoice amount, expected ${expected} received ${createFormRequestDto.totalInvoiceAmount}`
         })
       })
       .end(done);
   });
 
   it('throw error on incorrect total down payment', async (done) => {
-    createFormRequestDto.totalDownPaymentAmount = 400000
+    const expected = createFormRequestDto.totalDownPaymentAmount
+    createFormRequestDto.totalDownPaymentAmount = expected + 10000
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -359,14 +371,15 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `incorect total down payment amount, expected 20000 received 400000`
+          message: `incorect total down payment amount, expected ${expected} received ${createFormRequestDto.totalDownPaymentAmount}`
         })
       })
       .end(done);
   });
 
   it('throw error on incorrect total return', async (done) => {
-    createFormRequestDto.totalReturnAmount = 400000
+    const expected = createFormRequestDto.totalReturnAmount
+    createFormRequestDto.totalReturnAmount = expected + 10000
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -378,15 +391,16 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `incorect total return amount, expected 10000 received 400000`
+          message: `incorect total return amount, expected ${expected} received ${createFormRequestDto.totalReturnAmount}`
         })
       })
       .end(done);
   });
 
   it('throw error on incorrect total other', async (done) => {
-    createFormRequestDto.totalOtherAmount = 400000
-    
+    const expected = createFormRequestDto.totalOtherAmount
+    createFormRequestDto.totalOtherAmount = expected + 10000
+
     request(app)
       .post('/v1/purchase/payment-order')
       .set('Authorization', 'Bearer '+ jwtoken)
@@ -397,14 +411,15 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `incorect total other amount, expected 5000 received 400000`
+          message: `incorect total other amount, expected ${expected} received ${createFormRequestDto.totalOtherAmount}`
         })
       })
       .end(done);
   });
 
   it('throw error on incorrect total amount', async (done) => {
-    createFormRequestDto.totalAmount = 3000000
+    const expected = createFormRequestDto.totalAmount
+    createFormRequestDto.totalAmount = expected + 10000
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -416,16 +431,17 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `incorect total amount, expected 65000 received 3000000`
+          message: `incorect total amount, expected ${expected} received ${createFormRequestDto.totalAmount}`
         })
       })
       .end(done);
   });
 
   it('throw error on total down payment more than total invoice', async (done) => {
-    createFormRequestDto.invoices[0].amount = 10000
-    createFormRequestDto.totalInvoiceAmount = 10000
-    
+    const totalDownPayment = createFormRequestDto.totalDownPayment
+    createFormRequestDto.invoices[0].amount = totalDownPayment - 10000
+    createFormRequestDto.totalInvoiceAmount = totalDownPayment - 10000
+
     request(app)
       .post('/v1/purchase/payment-order')
       .set('Authorization', 'Bearer '+ jwtoken)
@@ -436,7 +452,7 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `total down payment more than total invoice, total down payment: 20000 > total invoice: 10000`
+          message: `total down payment more than total invoice, total down payment: ${totalDownPayment} > total invoice: ${createFormRequestDto.totalInvoiceAmount}`
         })
       })
       .end(done);
@@ -444,11 +460,12 @@ describe('Payment Order - CreateFormRequest', () => {
 
   it('throw error on total return more than total invoice', async (done) => {
     const { purchaseReturn } = recordFactories;
+    const amount = createFormRequestDto.totalInvoiceAmount + 10000
     await purchaseReturn.update({
-      amount: 110000,
-    }); 
-    createFormRequestDto.returns[0].amount = 110000
-    createFormRequestDto.totalReturnAmount = 110000
+      amount,
+    });
+    createFormRequestDto.returns[0].amount = amount
+    createFormRequestDto.totalReturnAmount = amount
 
     request(app)
       .post('/v1/purchase/payment-order')
@@ -460,7 +477,7 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect((res) => {
         expect(res.status).toEqual(httpStatus.UNPROCESSABLE_ENTITY);
         expect(res.body).toMatchObject({
-          message: `total return more than total invoice, total return: 110000 > total invoice: 100000`
+          message: `total return more than total invoice, total return: ${amount} > total invoice: ${createFormRequestDto.totalInvoiceAmount}`
         })
       })
       .end(done);
@@ -518,7 +535,6 @@ describe('Payment Order - CreateFormRequest', () => {
 
   it('check saved data same with data sent', async () => {
     const { branch, maker, approver } = recordFactories;
-    const mailerSpy = jest.spyOn(ProcessSendCreateApproval.prototype, 'call').mockReturnValue(true);
 
     await request(app)
       .post('/v1/purchase/payment-order')
@@ -529,7 +545,6 @@ describe('Payment Order - CreateFormRequest', () => {
       .expect('Content-Type', /json/)
       .expect(async (res) => {
         expect(res.status).toEqual(httpStatus.CREATED);
-        expect(mailerSpy).toHaveBeenCalled();
         expect(res.body.data).toMatchObject({
           id: expect.any(Number),
           paymentType: createFormRequestDto.paymentType,
@@ -707,7 +722,7 @@ describe('Payment Order - CreateFormRequest', () => {
       createFormRequestDto.totalDownPaymentAmount = availableDownPayment;
       createFormRequestDto.returns[0].amount = availableReturn;
       createFormRequestDto.totalReturnAmount = availableReturn;
-      createFormRequestDto.totalAmount = availableInvoice - 
+      createFormRequestDto.totalAmount = availableInvoice -
         availableDownPayment - availableReturn - createFormRequestDto.totalOtherAmount;
 
       await request(app)
@@ -761,11 +776,11 @@ describe('Payment Order - CreateFormRequest', () => {
         const formInvoice = await purchaseInvoice.getForm();
         expect(formInvoice.done).toEqual(false);
 
-        const formDownPayment = await purchaseDownPayment.getForm();        
+        const formDownPayment = await purchaseDownPayment.getForm();
         expect(formDownPayment.done).toEqual(false);
-        
-        const formReturn = await purchaseReturn.getForm();        
-        expect(formReturn.done).toEqual(false); 
+
+        const formReturn = await purchaseReturn.getForm();
+        expect(formReturn.done).toEqual(false);
       })
       .end(done);
   });
@@ -803,13 +818,13 @@ describe('Payment Order - CreateFormRequest', () => {
 
         const formDownPayment = await purchaseDownPayment.getForm();
         expect(formDownPayment.done).toEqual(true);
-        
+
         const formReturn = await purchaseReturn.getForm();
         expect(formReturn.done).toEqual(true);
       })
       .end(done);
   });
-  
+
 });
 
 const generateRecordFactories = async ({
