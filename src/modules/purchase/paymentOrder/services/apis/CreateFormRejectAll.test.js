@@ -226,7 +226,7 @@ describe('Payment Order - CreateFormRejectAll', () => {
         formableType: 'PurchaseInvoice',
       }
     });
-    expect(formInvoice.done).toEqual(1);
+    expect(formInvoice.done).toEqual(true);
 
     const formDownPayment = await tenantDatabase.Form.findOne({
       where: {
@@ -234,7 +234,7 @@ describe('Payment Order - CreateFormRejectAll', () => {
         formableType: 'PurchaseDownPayment',
       }
     });
-    expect(formDownPayment.done).toEqual(1);
+    expect(formDownPayment.done).toEqual(true);
 
     const formReturn = await tenantDatabase.Form.findOne({
       where: {
@@ -242,7 +242,7 @@ describe('Payment Order - CreateFormRejectAll', () => {
         formableType: 'PurchaseReturn',
       }
     });
-    expect(formReturn.done).toEqual(1);
+    expect(formReturn.done).toEqual(true);
 
     await request(app)
       .post('/v1/purchase/payment-order/reject')
@@ -255,9 +255,9 @@ describe('Payment Order - CreateFormRejectAll', () => {
     await formDownPayment.reload();
     await formInvoice.reload();
 
-    expect(formInvoice.done).toEqual(0);
-    expect(formDownPayment.done).toEqual(0);
-    expect(formReturn.done).toEqual(0);
+    expect(formInvoice.done).toEqual(false);
+    expect(formDownPayment.done).toEqual(false);
+    expect(formReturn.done).toEqual(false);
   });
 });
 
