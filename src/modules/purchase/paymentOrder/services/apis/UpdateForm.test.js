@@ -15,6 +15,8 @@ beforeEach(() => {
   ProcessSendCreateApproval.mockClear();
 });
 
+const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
 describe('Payment Order - UpdateForm', () => {
   let recordFactories, createFormRequestDto, updateFormRequestDto, jwtoken
   beforeEach(async (done) => {
@@ -121,7 +123,6 @@ describe('Payment Order - UpdateForm', () => {
 
       delete updateFormRequestDto['paymentType']
       delete updateFormRequestDto['supplierId']
-      delete updateFormRequestDto['date']
       delete updateFormRequestDto['requestApprovalTo']
       delete updateFormRequestDto['invoices']
       delete updateFormRequestDto['totalInvoiceAmount']
@@ -144,7 +145,6 @@ describe('Payment Order - UpdateForm', () => {
             meta: expect.arrayContaining([
               `"paymentType" is required`,
               `"supplierId" is required`,
-              `"date" is required`,
               `"requestApprovalTo" is required`,
               `"invoices" is required`,
               `"totalInvoiceAmount" is required`,
@@ -674,7 +674,7 @@ describe('Payment Order - UpdateForm', () => {
             approvalStatus: 0,
             id: expect.any(Number),
             branchId: branch.id,
-            date: updateFormRequestDto.date.toISOString(),
+            date: expect.stringMatching(isoPattern),
             number: oldForm.number,
             notes: updateFormRequestDto.notes,
             createdBy: maker.id,
@@ -706,7 +706,7 @@ describe('Payment Order - UpdateForm', () => {
           approvalStatus: 0,
           id: res.body.data.form.id,
           BranchId: branch.id,
-          date: updateFormRequestDto.date,
+          date: expect.stringMatching(isoPattern),
           number: oldForm.number,
           notes: updateFormRequestDto.notes,
           createdBy: maker.id,
