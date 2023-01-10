@@ -169,6 +169,60 @@ describe('Payment Order - DeleteFormRequest', () => {
     expect(form.formableId).toBe(paymentOrder.id);
     expect(form.formableType).toBe('PurchasePaymentOrder');
   });
+
+  it('form reference pending', async (done) => {
+    const { purchaseInvoice, purchaseDownPayment, purchaseReturn } = recordFactories;
+
+    const availableInvoice = await purchaseInvoice.getAvailable();
+    const availableDownPayment = await purchaseDownPayment.getAvailable();
+    const availableReturn = await purchaseReturn.getAvailable();
+
+    createFormRequestDto.invoices[0].amount = availableInvoice;
+    createFormRequestDto.totalInvoiceAmount = availableInvoice;
+    createFormRequestDto.downPayments[0].amount = availableDownPayment;
+    createFormRequestDto.totalDownPaymentAmount = availableDownPayment;
+    createFormRequestDto.returns[0].amount = availableReturn;
+    createFormRequestDto.totalReturnAmount = availableReturn;
+    createFormRequestDto.totalAmount = availableInvoice - availableDownPayment - availableReturn 
+      - createFormRequestDto.totalOther;
+
+    const paymentOrder = await request(app)
+      .post('/v1/purchase/payment-order')
+      .set('Authorization', 'Bearer '+ jwtoken)
+      .set('Tenant', 'test_dev')
+      .set('Content-Type', 'application/json')
+      .send(createFormRequestDto)
+      .expect('Content-Type', /json/);
+
+    const formInvoice = await purchaseInvoice.getForm();
+    expect(formInvoice.done).toEqual(true);
+
+    const formDownPayment = await purchaseDownPayment.getForm();
+    expect(formDownPayment.done).toEqual(true);
+
+    const formReturn = await purchaseReturn.getForm();
+    expect(formReturn.done).toEqual(true);
+
+    const deleteFormRequestDto = {
+      reason: faker.datatype.string(20),
+    };
+
+    const res = await request(app)
+      .delete('/v1/purchase/payment-order/' + paymentOrder.body.data.id)
+      .set('Authorization', 'Bearer '+ jwtoken)
+      .set('Tenant', 'test_dev')
+      .set('Content-Type', 'application/json')
+      .send(deleteFormRequestDto);
+
+    await formInvoice.reload();
+    expect(formInvoice.done).toEqual(false);
+
+    await formDownPayment.reload();
+    expect(formDownPayment.done).toEqual(false);
+
+    await formReturn.reload();
+    expect(formReturn.done).toEqual(false);
+  });
 });
 
 const generateRecordFactories = async ({
