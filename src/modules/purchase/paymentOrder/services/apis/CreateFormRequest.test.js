@@ -77,10 +77,6 @@ describe('Payment Order - CreateFormRequest', () => {
       delete createFormRequestDto['supplierId']
       delete createFormRequestDto['requestApprovalTo']
       delete createFormRequestDto['invoices']
-      delete createFormRequestDto['totalInvoiceAmount']
-      delete createFormRequestDto['totalDownPaymentAmount']
-      delete createFormRequestDto['totalReturnAmount']
-      delete createFormRequestDto['totalOtherAmount']
       delete createFormRequestDto['totalAmount']
 
       request(app)
@@ -99,10 +95,6 @@ describe('Payment Order - CreateFormRequest', () => {
               `"supplierId" is required`,
               `"requestApprovalTo" is required`,
               `"invoices" is required`,
-              `"totalInvoiceAmount" is required`,
-              `"totalDownPaymentAmount" is required`,
-              `"totalReturnAmount" is required`,
-              `"totalOtherAmount" is required`,
               `"totalAmount" is required`,
             ])
           })
@@ -110,8 +102,11 @@ describe('Payment Order - CreateFormRequest', () => {
         .end(done);
     });
 
-    it('throw if invoices amount null', async (done) => {
+    it('throw if order amount null', async (done) => {
       delete createFormRequestDto.invoices[0]['amount']
+      delete createFormRequestDto.downPayments[0]['amount']
+      delete createFormRequestDto.returns[0]['amount']
+      delete createFormRequestDto.others[0]['amount']
 
       request(app)
         .post('/v1/purchase/payment-order')
@@ -123,14 +118,23 @@ describe('Payment Order - CreateFormRequest', () => {
         .expect((res) => {
           expect(res.status).toEqual(httpStatus.BAD_REQUEST);
           expect(res.body).toMatchObject({
-            message: `"invoices[0].amount" is required`
+            message: 'invalid data',
+            meta: expect.arrayContaining([
+              `"invoice amount" is required`,
+              `"downPayment amount" is required`,
+              `"return amount" is required`,
+              `"other amount" is required`,
+            ])
           })
         })
         .end(done);
     });
 
-    it('throw if invoices amount zero', async (done) => {
+    it('throw if order amount zero', async (done) => {
       createFormRequestDto.invoices[0].amount = 0
+      createFormRequestDto.downPayments[0].amount = 0
+      createFormRequestDto.returns[0].amount = 0
+      createFormRequestDto.others[0].amount = 0
 
       request(app)
         .post('/v1/purchase/payment-order')
@@ -142,7 +146,35 @@ describe('Payment Order - CreateFormRequest', () => {
         .expect((res) => {
           expect(res.status).toEqual(httpStatus.BAD_REQUEST);
           expect(res.body).toMatchObject({
-            message: `"invoices[0].amount" must be greater than or equal to 1`
+            message: 'invalid data',
+            meta: expect.arrayContaining([
+              `"invoice amount" must be greater than or equal to 1`,
+              `"downPayment amount" must be greater than or equal to 1`,
+              `"return amount" must be greater than or equal to 1`,
+              `"other amount" must be greater than or equal to 1`,
+            ])
+          })
+        })
+        .end(done);
+    });
+
+    it('throw if others chart of account null', async (done) => {
+      delete createFormRequestDto.others[0]['coaId']
+
+      request(app)
+        .post('/v1/purchase/payment-order')
+        .set('Authorization', 'Bearer '+ jwtoken)
+        .set('Tenant', 'test_dev')
+        .set('Content-Type', 'application/json')
+        .send(createFormRequestDto)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.status).toEqual(httpStatus.BAD_REQUEST);
+          expect(res.body).toMatchObject({
+            message: 'invalid data',
+            meta: expect.arrayContaining([
+              `"others coaId" is required`,
+            ])
           })
         })
         .end(done);
