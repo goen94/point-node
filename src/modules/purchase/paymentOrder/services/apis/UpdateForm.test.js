@@ -835,6 +835,24 @@ describe('Payment Order - UpdateForm', () => {
   it('check payment order not available to cash out / bank out', async () => {
     const paymentOrder = await tenantDatabase.PurchasePaymentOrder.findOne();
 
+    // approve payment order
+    await request(app)
+      .post('/v1/purchase/payment-order/' + paymentOrder.id + '/approve')
+      .set('Authorization', 'Bearer '+ jwtoken)
+      .set('Tenant', 'test_dev');
+
+    // check available to cash out / bank out after approve
+    await request(app)
+      .get('/v1/purchase/payment-order?filter_form=pending;approvalApproved')
+      .set('Authorization', 'Bearer '+ jwtoken)
+      .set('Tenant', 'test_dev')
+      .set('Content-Type', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(async (res) => {
+        expect(res.status).toEqual(httpStatus.OK);
+        expect(res.body.data.length).toEqual(1);
+      });
+
     await request(app)
       .patch('/v1/purchase/payment-order/' + paymentOrder.id)
       .set('Authorization', 'Bearer '+ jwtoken)
