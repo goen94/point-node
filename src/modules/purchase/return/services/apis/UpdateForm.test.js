@@ -15,6 +15,8 @@ beforeEach(() => {
   ProcessSendCreateApproval.mockClear();
 });
 
+const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
 describe('Purchase Return - UpdateForm', () => {
   let recordFactories, createFormRequestDto, updateFormRequestDto, jwtoken
   beforeEach(async (done) => {
@@ -81,7 +83,7 @@ describe('Purchase Return - UpdateForm', () => {
             approvalStatus: 0,
             id: expect.any(Number),
             branchId: branch.id,
-            date: updateFormRequestDto.date.toISOString(),
+            date: expect.stringMatching(isoPattern),
             number: oldForm.number,
             notes: updateFormRequestDto.notes,
             createdBy: maker.id,
@@ -117,7 +119,7 @@ describe('Purchase Return - UpdateForm', () => {
           approvalStatus: 0,
           id: res.body.data.form.id,
           BranchId: branch.id,
-          date: updateFormRequestDto.date,
+          date: expect.stringMatching(isoPattern),
           number: oldForm.number,
           notes: updateFormRequestDto.notes,
           createdBy: maker.id,

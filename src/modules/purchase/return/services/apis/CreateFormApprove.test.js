@@ -182,7 +182,7 @@ describe('Purchase Return - CreateFormApprove', () => {
             productionNumber: purchaseReturnItem[0].productionNumber,
           },
         }).call();
-        expect(updatedStock).toBe(currentStock + purchaseReturnItem[0].quantity);
+        expect(updatedStock).toBe(currentStock - purchaseReturnItem[0].quantity);
 
         const activity = await tenantDatabase.UserActivity.findOne({
           where: {

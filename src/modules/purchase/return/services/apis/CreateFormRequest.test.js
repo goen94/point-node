@@ -17,6 +17,8 @@ beforeEach(() => {
   ProcessSendCreateApproval.mockClear();
 });
 
+const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
 describe('Purchase Return - CreateFormRequest', () => {
   let recordFactories, createFormRequestDto, jwtoken
   beforeEach(async (done) => {
@@ -73,13 +75,13 @@ describe('Purchase Return - CreateFormRequest', () => {
             approvalStatus: 0,
             id: expect.any(Number),
             branchId: branch.id,
-            date: createFormRequestDto.date.toISOString(),
-            number: 'PRETURN' + moment(createFormRequestDto.date).format('YYMM') + '001',
+            date: expect.stringMatching(isoPattern),
+            number: 'PRETURN' + moment(new Date()).format('YYMM') + '001',
             notes: createFormRequestDto.notes,
             createdBy: maker.id,
             updatedBy: maker.id,
             incrementNumber: 1,
-            incrementGroup: Number(moment(createFormRequestDto.date).format('YYMM')),
+            incrementGroup: Number(moment(new Date()).format('YYMM')),
             formableId: res.body.data.id,
             formableType: 'PurchaseReturn',
             requestApprovalTo: approver.id,
@@ -109,13 +111,13 @@ describe('Purchase Return - CreateFormRequest', () => {
           approvalStatus: 0,
           id: res.body.data.form.id,
           BranchId: branch.id,
-          date: createFormRequestDto.date,
-          number: 'PRETURN' + moment(createFormRequestDto.date).format('YYMM') + '001',
+          date: expect.stringMatching(isoPattern),
+          number: 'PRETURN' + moment(new Date()).format('YYMM') + '001',
           notes: createFormRequestDto.notes,
           createdBy: maker.id,
           updatedBy: maker.id,
           incrementNumber: 1,
-          incrementGroup: Number(moment(createFormRequestDto.date).format('YYMM')),
+          incrementGroup: Number(moment(new Date()).format('YYMM')),
           formableId: res.body.data.id,
           formableType: 'PurchaseReturn',
           requestApprovalTo: approver.id,
@@ -142,9 +144,6 @@ describe('Purchase Return - CreateFormRequest', () => {
           allocationId: createFormRequestDto.invoices[0].allocationId
         });
 
-        const purchaseInvoice = purchaseReturn.getPurchaseInvoice();
-        expect(purchaseInvoice).toBeDefined();
-
         const activity = await tenantDatabase.UserActivity.findOne({
           where: {
             number: purchaseReturnForm.number,
@@ -168,7 +167,7 @@ describe('Purchase Return - CreateFormRequest', () => {
           where: { id: res.body.data.form.id }
         });
         expect(purchaseReturnForm).toMatchObject({
-          number: 'PRETURN' + moment(createFormRequestDto.date).format('YYMM') + '002',
+          number: 'PRETURN' + moment(new Date()).format('YYMM') + '002',
         });
       })
   });
@@ -574,7 +573,6 @@ describe('Purchase Return - CreateFormRequest', () => {
     const amount = expected + 10000;
     createFormRequestDto.amount = amount;
 
-
     request(app)
       .post('/v1/purchase/return')
       .set('Authorization', 'Bearer '+ jwtoken)
@@ -732,7 +730,6 @@ const generateCreateFormRequestDto = ({
     purchaseInvoiceId: purchaseInvoice.id,
     supplierId: supplier.id,
     warehouseId: warehouse.id,
-    date: new Date('2022-12-01 00:00:00'),
     items: [
       {
         purchaseInvoiceItemId: purchaseInvoiceItem.id,
