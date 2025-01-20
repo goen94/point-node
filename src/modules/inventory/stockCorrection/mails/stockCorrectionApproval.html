@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    .d-flex {
+      display: flex;
+    }
+    .btn-action {
+      padding: 10px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin: 5px 10px;
+      width: 75px;
+      text-align: center;
+      color: white !important;
+      background-color: rgb(100, 100, 100);
+    }
+    .btn-action:hover {
+      filter: brightness(75%);
+    }
+    .btn-secondary {
+      background-color: rgb(100, 100, 100);
+    }
+    .text-right {
+      text-align: right;
+    }
+    .table-items {
+      border: solid 1px black;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    table.table-items, .table-items th, .table-items td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    .table-items th, .table-items td {
+      padding: 5px;
+    }
+    .btn-success {
+      background-color: rgb(39, 168, 39);
+    }
+    .btn-danger {
+      background-color: rgb(250, 68, 68);
+    }
+    .action-container {
+      margin-top: 10px;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <p>Hello Mrs/Mr/Ms {{approverName}}</p>
+  <p>You have {{approvalType}} approval request from stock correction. We would like to details as follows:</p>
+  <table>
+    <tr>
+      <td style="width: 125px;">Form number</td>
+      <td>{{formNumber}}</td>
+    </tr>
+    <tr>
+      <td>Form date</td>
+      <td>{{formDate}}</td>
+    </tr>
+    <tr>
+      <td>Warehouse</td>
+      <td>{{warehouseName}}</td>
+    </tr>
+    <tr>
+      <td>Created at</td>
+      <td>{{createdAt}}</td>
+    </tr>
+    <tr>
+      <td>Created by</td>
+      <td>{{createdBy}}</td>
+    </tr>
+    <tr>
+      <td>Notes</td>
+      <td>{{notes}}</td>
+    </tr>
+  </table>
+  <table class="table-items">
+    <tr>
+      <th>No</th>
+      <th>Item</th>
+      <th>Allocation</th>
+      <th>Stock Database</th>
+      <th>Stock Correction</th>
+      <th>Balance</th>
+      <th>Notes</th>
+    </tr>
+    {{items}}
+  </table>
+  <div class="action-container d-flex">
+    <a class="btn-action btn-secondary" href="{{checkLink}}" target="_blank">Check</a>
+    <a class="btn-action btn-success" href="{{approveLink}}" target="_blank">Approve</a>
+    <a class="btn-action btn-danger" href="{{rejectLink}}" target="_blank">Reject</a>
+  </div>
+</body>
+</html>

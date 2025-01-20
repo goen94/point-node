@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    .print-sales-invoice-container {
+      width: 90%;
+      padding: 30px;
+    }
+    .d-flex {
+      display: flex;
+    }
+    .d-flex-row {
+      display: flex;
+      flex-direction: column;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .table-items {
+      border: solid 1px black;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    table.table-items, .table-items th, .table-items td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    .table-items th, .table-items td {
+      padding: 5px;
+    }
+    .justify-content-between {
+      justify-content: space-between;
+    }
+    .my-5px {
+      margin: 5px 0 5px 0;
+    }
+    .company-detail {
+      min-width: 200px;
+      max-width: 250px;
+    }
+    .header-divider {
+      height:10px;
+      border:none;
+      color:gray;
+      background-color:gray;
+    }
+    @media print {
+      table.header-detail tr td {
+        line-height: 0.5px;
+      }
+      #print-sales-invoice thead tr td {
+        padding-top: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <table
+    id="print-sales-invoice"
+    class="print-sales-invoice-container m-2 mb-4 mx-auto"
+  >
+    <thead>
+      <tr>
+        <td>
+          <div
+            class="d-flex justify-content-between"
+            style="margin-bottom: 10px;"
+          >
+            <div style="width: 110px; height: 110px; align-self: center;">
+              <img src="{{logoUrl}}" alt="Logo" style="width: 100px; height: 100px;" />
+            </div>
+            <div class="company-detail">
+              <h1 style="margin-top: 0px;">Invoice</h1>
+              <h3 class="my-5px">{{companyName}}</h3>
+              <p class="my-5px">{{companyAddress}}</p>
+              <p class="my-5px">{{companyPhone}}</p>
+            </div>
+          </div>
+          <hr class="header-divider">
+          <div
+            class="d-flex justify-content-between"
+            style="margin-top: 10px; margin-bottom: 10px"
+          >
+            <table
+              class="header-detail"
+              style="margin-right: 20px;"
+            >
+              <tr>
+                <td>Date</td>
+                <td>:</td>
+                <td>{{date}}</td>
+              </tr>
+              <tr>
+                <td>Invoice number</td>
+                <td>:</td>
+                <td>{{invoiceNumber}}</td>
+              </tr>
+              {{salesOrderNumber}}
+            </table>
+            <table
+              class="header-detail"
+              style="margin-left: 20px;"
+            >
+              <tr>
+                <td>Customer</td>
+                <td>:</td>
+                <td>{{customerName}}</td>
+              </tr>
+              <tr>
+                <td>Address</td>
+                <td>:</td>
+                <td>{{customerAddress}}</td>
+              </tr>
+              <tr>
+                <td>Phone number</td>
+                <td>:</td>
+                <td>{{customerPhone}}</td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <table
+            class="table-items"
+            style="width: 100%;"
+          >
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Discount</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            {{items}}
+            <tr>
+              <td colspan="5" class="text-right">Sub total</td>
+              <td>{{subTotal}}</td>
+            </tr>
+            <tr>
+              <td colspan="5" class="text-right">Discount</td>
+              <td>{{discount}}</td>
+            </tr>
+            <tr>
+              <td colspan="5" class="text-right">Tax base</td>
+              <td>{{taxBase}}</td>
+            </tr>
+            <tr>
+              <td colspan="5" class="text-right">Tax</td>
+              <td>{{tax}}</td>
+            </tr>
+            <tr>
+              <td colspan="5" class="text-right">Total</td>
+              <td>{{total}}</td>
+            </tr>
+          </table>
+          <span>Notes: {{notes}}</span>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot></tfoot>
+  </table>
+</body>
+</html>

@@ -1,0 +1,58 @@
+[
+    {
+        "scope": "http://point.test:80",
+        "method": "POST",
+        "path": "/api/v1/auth/fetch",
+        "body": {
+            "access_token": "[SECRET]"
+        },
+        "status": 200,
+        "response": {
+            "data": {
+                "id": 2599,
+                "name": "demodemo",
+                "first_name": "demo",
+                "last_name": "demo",
+                "address": null,
+                "phone": null,
+                "email": "bosgagitu@gmail.com",
+                "phone_confirmation_code": null,
+                "phone_confirmed": 0,
+                "email_confirmation_code": "eyJpdiI6Ild1T1lwOG90eEQwdjZNUj",
+                "email_confirmed": 0,
+                "created_at": "2021-08-14T08:22:31.000000Z",
+                "updated_at": "2021-08-14T08:22:31.000000Z",
+                "full_name": "demo demo"
+            }
+        },
+        "rawHeaders": [
+            "Server",
+            "nginx/1.10.3 (Ubuntu)",
+            "Content-Type",
+            "application/json",
+            "Transfer-Encoding",
+            "chunked",
+            "Connection",
+            "close",
+            "Cache-Control",
+            "no-cache, private",
+            "Date",
+            "Wed, 08 Sep 2021 00:59:09 GMT",
+            "X-RateLimit-Limit",
+            "300",
+            "X-RateLimit-Remaining",
+            "299",
+            "Access-Control-Allow-Origin",
+            "*",
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers",
+            "Tenant, Authorization, Content-Type, X-Requested-With, Origin, Timezone",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "Access-Control-Max-Age",
+            "86400"
+        ],
+        "responseIsBinary": false
+    }
+]

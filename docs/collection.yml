@@ -1,0 +1,5160 @@
+openapi: 3.0.0
+info:
+  title: v1
+  version: 1.0.0
+servers:
+  - url: http://{{baseurl}}
+tags:
+  - name: sales invoices
+  - name: setting
+  - name: stock corrections
+paths:
+  /v1/sales/invoices:
+    get:
+      tags:
+        - sales invoices
+      summary: Get all sales invoices
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+        - name: 'limit'
+          in: query
+          schema:
+            type: number
+          example: 10
+        - name: 'page'
+          in: query
+          schema:
+            type: number
+          example: 1
+        - name: 'filter_date_min'
+          in: query
+          schema:
+            type: date
+          example: '2022-03-01 00:00:00'
+        - name: 'filter_date_max'
+          in: query
+          schema:
+            type: date
+          example: '2022-03-01 00:00:00'
+        - name: 'filter_form'
+          in: query
+          schema:
+            type: string
+          example: 'pending;approvalDone'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"4cce-9gWsf+1mbQXWpd5MoERfRwMwNvA"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 01:30:03 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  - id: 85
+                    dueDate: '2021-10-15T01:00:15.000Z'
+                    discountPercent: 0
+                    discountValue: 30000
+                    tax: 111000
+                    typeOfTax: exclude
+                    amount: 1221000
+                    remaining: 1221000
+                    customerId: 1
+                    customerName: customer 001
+                    customerAddress: ''
+                    customerPhone: ''
+                    referenceableId: 71
+                    referenceableType: SalesDeliveryNote
+                    form:
+                      id: 311
+                      branchId: 1
+                      date: '2021-10-15T01:01:00.000Z'
+                      number: SI2110048
+                      editedNumber: null
+                      notes: null
+                      editedNotes: null
+                      createdBy: 1
+                      updatedBy: 1
+                      done: false
+                      incrementNumber: 48
+                      incrementGroup: 202110
+                      formableId: 85
+                      formableType: SalesInvoice
+                      requestApprovalTo: 1
+                      approvalBy: null
+                      approvalAt: null
+                      approvalReason: null
+                      approvalStatus: 0
+                      requestCancellationTo: null
+                      requestCancellationBy: null
+                      requestCancellationAt: null
+                      requestCancellationReason: null
+                      cancellationApprovalAt: null
+                      cancellationApprovalBy: null
+                      cancellationApprovalReason: null
+                      cancellationStatus: null
+                      createdAt: '2021-10-14T23:48:06.000Z'
+                      updatedAt: '2021-10-15T01:01:00.000Z'
+                      BranchId: 1
+                      createdByUser:
+                        fullName: Vincenzo Moen
+                        id: 1
+                        name: demodemon
+                        firstName: Vincenzo
+                        lastName: Moen
+                        address: null
+                        phone: null
+                        email: silaen.hjr@gmail.com
+                        branchId: null
+                        createdAt: '2021-09-15T13:40:50.000Z'
+                        updatedAt: '2021-09-15T13:40:50.000Z'
+                      approvalByUser: null
+                    items:
+                      - id: 102
+                        salesInvoiceId: 85
+                        deliveryNoteId: 71
+                        deliveryNoteItemId: 107
+                        itemId: 1
+                        itemName: teh botol
+                        quantity: 200
+                        price: 6000
+                        discountPercent: 5
+                        discountValue: 300
+                        taxable: true
+                        unit: PCS
+                        converter: '1.000000000000000000000000000000'
+                        notes: null
+                        allocationId: null
+                        SalesInvoiceId: 85
+                        allocation: null
+                    customer:
+                      id: 1
+                      code: null
+                      taxIdentificationNumber: null
+                      name: customer 001
+                      address: null
+                      city: null
+                      state: null
+                      country: null
+                      zipCode: null
+                      latitude: null
+                      longitude: null
+                      phone: null
+                      phoneCc: null
+                      email: silaen.hjr@gmail.com
+                      notes: null
+                      creditLimit: '0.000000000000000000000000000000'
+                      branchId: 1
+                      createdBy: 1
+                      updatedBy: 1
+                      archivedBy: null
+                      pricingGroupId: 1
+                      archivedAt: null
+                      createdAt: '2021-09-15T14:08:56.000Z'
+                      updatedAt: '2021-09-15T14:08:56.000Z'
+                      BranchId: 1
+                  - id: 84
+                    dueDate: '2021-10-14T01:25:16.000Z'
+                    discountPercent: 0
+                    discountValue: 1000
+                    tax: 58900
+                    typeOfTax: exclude
+                    amount: 647900
+                    remaining: 647900
+                    customerId: 1
+                    customerName: customer 001
+                    customerAddress: ''
+                    customerPhone: ''
+                    referenceableId: 70
+                    referenceableType: SalesDeliveryNote
+                    form:
+                      id: 307
+                      branchId: 1
+                      date: '2021-10-14T01:25:30.000Z'
+                      number: SI2110047
+                      editedNumber: null
+                      notes: null
+                      editedNotes: null
+                      createdBy: 1
+                      updatedBy: 1
+                      done: false
+                      incrementNumber: 47
+                      incrementGroup: 202110
+                      formableId: 84
+                      formableType: SalesInvoice
+                      requestApprovalTo: 1
+                      approvalBy: 1
+                      approvalAt: '2021-10-14T01:26:39.000Z'
+                      approvalReason: Reject from email
+                      approvalStatus: -1
+                      requestCancellationTo: null
+                      requestCancellationBy: null
+                      requestCancellationAt: null
+                      requestCancellationReason: null
+                      cancellationApprovalAt: null
+                      cancellationApprovalBy: null
+                      cancellationApprovalReason: null
+                      cancellationStatus: null
+                      createdAt: '2021-10-14T01:25:30.000Z'
+                      updatedAt: '2021-10-14T01:26:39.000Z'
+                      BranchId: 1
+                      createdByUser:
+                        fullName: Vincenzo Moen
+                        id: 1
+                        name: demodemon
+                        firstName: Vincenzo
+                        lastName: Moen
+                        address: null
+                        phone: null
+                        email: silaen.hjr@gmail.com
+                        branchId: null
+                        createdAt: '2021-09-15T13:40:50.000Z'
+                        updatedAt: '2021-09-15T13:40:50.000Z'
+                      approvalByUser:
+                        fullName: Vincenzo Moen
+                        id: 1
+                        name: demodemon
+                        firstName: Vincenzo
+                        lastName: Moen
+                        address: null
+                        phone: null
+                        email: silaen.hjr@gmail.com
+                        branchId: null
+                        createdAt: '2021-09-15T13:40:50.000Z'
+                        updatedAt: '2021-09-15T13:40:50.000Z'
+                    items:
+                      - id: 101
+                        salesInvoiceId: 84
+                        deliveryNoteId: 70
+                        deliveryNoteItemId: 106
+                        itemId: 1
+                        itemName: teh botol
+                        quantity: 100
+                        price: 6000
+                        discountPercent: 0
+                        discountValue: 100
+                        taxable: true
+                        unit: PCS
+                        converter: '1.000000000000000000000000000000'
+                        notes: null
+                        allocationId: null
+                        SalesInvoiceId: 84
+                        allocation: null
+                    customer:
+                      id: 1
+                      code: null
+                      taxIdentificationNumber: null
+                      name: customer 001
+                      address: null
+                      city: null
+                      state: null
+                      country: null
+                      zipCode: null
+                      latitude: null
+                      longitude: null
+                      phone: null
+                      phoneCc: null
+                      email: silaen.hjr@gmail.com
+                      notes: null
+                      creditLimit: '0.000000000000000000000000000000'
+                      branchId: 1
+                      createdBy: 1
+                      updatedBy: 1
+                      archivedBy: null
+                      pricingGroupId: 1
+                      archivedAt: null
+                      createdAt: '2021-09-15T14:08:56.000Z'
+                      updatedAt: '2021-09-15T14:08:56.000Z'
+                      BranchId: 1
+                meta:
+                  current_page: 1
+                  from: 1
+                  last_page: 1
+                  per_page: 10
+                  to: 1
+                  total: 102
+  /v1/sales/invoices/report:
+    get:
+      tags:
+        - sales invoices
+      summary: Get report
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+        - name: filter_date_min
+          in: query
+          schema:
+            type: date
+          example: '2022-03-01 00:00:00'
+        - name: filter_date_max
+          in: query
+          schema:
+            type: date
+          example: '2022-03-01 00:00:00'
+        - name: selected_item
+          in: query
+          schema:
+            type: ids of item
+          example: '2,5'
+        - name: selected_customer
+          in: query
+          schema:
+            type: ids of customer
+          example: '2,5,6'
+        - name: selected_allocation
+          in: query
+          schema:
+            type: ids of allocation
+          example: '2,3'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"18864-PwOmkwPiL2atqq8/LPk2SEf+XnM"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 03:23:22 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  - id: 11
+                    dueDate: '2021-09-21T14:39:40.000Z'
+                    discountPercent: '0.000000000000000000000000000000'
+                    discountValue: '0.000000000000000000000000000000'
+                    tax: '500000.000000000000000000000000000000'
+                    typeOfTax: exclude
+                    amount: '5500000.000000000000000000000000000000'
+                    remaining: '5500000.000000000000000000000000000000'
+                    customerId: 1
+                    customerName: customer 001
+                    customerAddress: ''
+                    customerPhone: ''
+                    referenceableId: 1
+                    referenceableType: SalesDeliveryNote
+                    items:
+                      - id: 1
+                        salesInvoiceId: 11
+                        deliveryNoteId: 1
+                        deliveryNoteItemId: 1
+                        itemId: 1
+                        itemName: teh botol
+                        quantity: '1000.000000000000000000000000000000'
+                        price: '5000.000000000000000000000000000000'
+                        discountPercent: '0.000000000000000000000000000000'
+                        discountValue: '0.000000000000000000000000000000'
+                        taxable: true
+                        unit: PCS
+                        converter: '1.000000000000000000000000000000'
+                        notes: null
+                        allocationId: null
+                        SalesInvoiceId: 11
+                        allocation: null
+                    form:
+                      id: 16
+                      branchId: 1
+                      date: '2021-09-21T14:40:51.000Z'
+                      number: SI2109001
+                      editedNumber: null
+                      notes: null
+                      editedNotes: null
+                      createdBy: 1
+                      updatedBy: 1
+                      done: false
+                      incrementNumber: 1
+                      incrementGroup: 202109
+                      formableId: 11
+                      formableType: SalesInvoice
+                      requestApprovalTo: 1
+                      approvalBy: 1
+                      approvalAt: '2021-09-27T01:17:09.000Z'
+                      approvalReason: null
+                      approvalStatus: 1
+                      requestCancellationTo: 1
+                      requestCancellationBy: 1
+                      requestCancellationAt: '2021-09-29T00:40:45.000Z'
+                      requestCancellationReason: kidding
+                      cancellationApprovalAt: '2021-09-29T00:51:21.000Z'
+                      cancellationApprovalBy: 1
+                      cancellationApprovalReason: null
+                      cancellationStatus: 1
+                      createdAt: '2021-09-21T14:40:51.000Z'
+                      updatedAt: '2021-09-29T00:51:21.000Z'
+                      BranchId: 1
+                    customer:
+                      id: 1
+                      code: null
+                      taxIdentificationNumber: null
+                      name: customer 001
+                      address: null
+                      city: null
+                      state: null
+                      country: null
+                      zipCode: null
+                      latitude: null
+                      longitude: null
+                      phone: null
+                      phoneCc: null
+                      email: silaen.hjr@gmail.com
+                      notes: null
+                      creditLimit: '0.000000000000000000000000000000'
+                      branchId: 1
+                      createdBy: 1
+                      updatedBy: 1
+                      archivedBy: null
+                      pricingGroupId: 1
+                      archivedAt: null
+                      createdAt: '2021-09-15T14:08:56.000Z'
+                      updatedAt: '2021-09-15T14:08:56.000Z'
+                      BranchId: 1
+                  - id: 12
+                    dueDate: '2021-09-22T00:00:00.000Z'
+                    discountPercent: '0.000000000000000000000000000000'
+                    discountValue: '100000.000000000000000000000000000000'
+                    tax: '118181.818181818180000000000000000000'
+                    typeOfTax: include
+                    amount: '1300000.000000000000000000000000000000'
+                    remaining: '1300000.000000000000000000000000000000'
+                    customerId: 1
+                    customerName: customer 001
+                    customerAddress: ''
+                    customerPhone: ''
+                    referenceableId: 2
+                    referenceableType: SalesDeliveryNote
+                    items:
+                      - id: 2
+                        salesInvoiceId: 12
+                        deliveryNoteId: 2
+                        deliveryNoteItemId: 2
+                        itemId: 1
+                        itemName: teh botol
+                        quantity: '100.000000000000000000000000000000'
+                        price: '5000.000000000000000000000000000000'
+                        discountPercent: '0.000000000000000000000000000000'
+                        discountValue: '0.000000000000000000000000000000'
+                        taxable: true
+                        unit: PCS
+                        converter: '1.000000000000000000000000000000'
+                        notes: null
+                        allocationId: null
+                        SalesInvoiceId: 12
+                        allocation: null
+                      - id: 3
+                        salesInvoiceId: 12
+                        deliveryNoteId: 2
+                        deliveryNoteItemId: 3
+                        itemId: 1
+                        itemName: teh botol
+                        quantity: '200.000000000000000000000000000000'
+                        price: '4500.000000000000000000000000000000'
+                        discountPercent: '0.000000000000000000000000000000'
+                        discountValue: '0.000000000000000000000000000000'
+                        taxable: true
+                        unit: PCS
+                        converter: '1.000000000000000000000000000000'
+                        notes: null
+                        allocationId: null
+                        SalesInvoiceId: 12
+                        allocation: null
+                    form:
+                      id: 22
+                      branchId: 1
+                      date: '2021-09-21T23:21:25.000Z'
+                      number: SI2109002
+                      editedNumber: null
+                      notes: null
+                      editedNotes: null
+                      createdBy: 1
+                      updatedBy: 1
+                      done: false
+                      incrementNumber: 2
+                      incrementGroup: 202109
+                      formableId: 12
+                      formableType: SalesInvoice
+                      requestApprovalTo: 1
+                      approvalBy: 1
+                      approvalAt: '2021-09-27T01:18:28.000Z'
+                      approvalReason: null
+                      approvalStatus: 1
+                      requestCancellationTo: 1
+                      requestCancellationBy: 1
+                      requestCancellationAt: '2021-09-29T00:57:36.000Z'
+                      requestCancellationReason: coba aja sih
+                      cancellationApprovalAt: '2021-09-29T00:57:46.000Z'
+                      cancellationApprovalBy: 1
+                      cancellationApprovalReason: tapi jangan dihapus ya
+                      cancellationStatus: -1
+                      createdAt: '2021-09-21T23:21:25.000Z'
+                      updatedAt: '2021-09-29T00:57:46.000Z'
+                      BranchId: 1
+                    customer:
+                      id: 1
+                      code: null
+                      taxIdentificationNumber: null
+                      name: customer 001
+                      address: null
+                      city: null
+                      state: null
+                      country: null
+                      zipCode: null
+                      latitude: null
+                      longitude: null
+                      phone: null
+                      phoneCc: null
+                      email: silaen.hjr@gmail.com
+                      notes: null
+                      creditLimit: '0.000000000000000000000000000000'
+                      branchId: 1
+                      createdBy: 1
+                      updatedBy: 1
+                      archivedBy: null
+                      pricingGroupId: 1
+                      archivedAt: null
+                      createdAt: '2021-09-15T14:08:56.000Z'
+                      updatedAt: '2021-09-15T14:08:56.000Z'
+                      BranchId: 1
+                meta:
+                  filter:
+                    min_date: '2021-09-19T00:00:00.000Z'
+                    max_date: '2021-10-19T23:59:59.999Z'
+  /v1/sales/invoices/86:
+    get:
+      tags:
+        - sales invoices
+      summary: Get one sales invoice
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"d50-BX0ADUxfM9T28jL5Buye5DlMs5I"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 01:38:37 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 86
+                  dueDate: '2021-10-20T00:00:00.000Z'
+                  discountPercent: 0
+                  discountValue: 0
+                  tax: 0
+                  typeOfTax: non
+                  amount: 90000
+                  remaining: 90000
+                  customerId: 1
+                  customerName: customer 001
+                  customerAddress: ''
+                  customerPhone: ''
+                  referenceableId: 72
+                  referenceableType: SalesDeliveryNote
+                  items:
+                    - id: 103
+                      salesInvoiceId: 86
+                      deliveryNoteId: 72
+                      deliveryNoteItemId: 108
+                      itemId: 3
+                      itemName: Ciki
+                      quantity: 100
+                      price: 900
+                      discountPercent: 0
+                      discountValue: 0
+                      taxable: true
+                      unit: PCS
+                      converter: '1.000000000000000000000000000000'
+                      notes: null
+                      allocationId: null
+                      SalesInvoiceId: 86
+                  form:
+                    id: 319
+                    branchId: 1
+                    date: '2021-10-19T01:31:17.000Z'
+                    number: SI2110049
+                    editedNumber: null
+                    notes: example notes
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 49
+                    incrementGroup: 202110
+                    formableId: 86
+                    formableType: SalesInvoice
+                    requestApprovalTo: 1
+                    approvalBy: 1
+                    approvalAt: '2021-10-19T01:35:11.000Z'
+                    approvalReason: example reject reason
+                    approvalStatus: -1
+                    requestCancellationTo: null
+                    requestCancellationBy: null
+                    requestCancellationAt: null
+                    requestCancellationReason: null
+                    cancellationApprovalAt: null
+                    cancellationApprovalBy: null
+                    cancellationApprovalReason: null
+                    cancellationStatus: null
+                    createdAt: '2021-10-19T01:31:17.000Z'
+                    updatedAt: '2021-10-19T01:35:11.000Z'
+                    BranchId: 1
+                    requestApprovalToUser:
+                      fullName: Vincenzo Moen
+                      id: 1
+                      name: demodemon
+                      firstName: Vincenzo
+                      lastName: Moen
+                      address: null
+                      phone: null
+                      email: silaen.hjr@gmail.com
+                      branchId: null
+                      createdAt: '2021-09-15T13:40:50.000Z'
+                      updatedAt: '2021-09-15T13:40:50.000Z'
+                    createdByUser:
+                      fullName: Vincenzo Moen
+                      id: 1
+                      name: demodemon
+                      firstName: Vincenzo
+                      lastName: Moen
+                      address: null
+                      phone: null
+                      email: silaen.hjr@gmail.com
+                      branchId: null
+                      createdAt: '2021-09-15T13:40:50.000Z'
+                      updatedAt: '2021-09-15T13:40:50.000Z'
+                  customer:
+                    id: 1
+                    code: null
+                    taxIdentificationNumber: null
+                    name: customer 001
+                    address: null
+                    city: null
+                    state: null
+                    country: null
+                    zipCode: null
+                    latitude: null
+                    longitude: null
+                    phone: null
+                    phoneCc: null
+                    email: silaen.hjr@gmail.com
+                    notes: null
+                    creditLimit: '0.000000000000000000000000000000'
+                    branchId: 1
+                    createdBy: 1
+                    updatedBy: 1
+                    archivedBy: null
+                    pricingGroupId: 1
+                    archivedAt: null
+                    createdAt: '2021-09-15T14:08:56.000Z'
+                    updatedAt: '2021-09-15T14:08:56.000Z'
+                    BranchId: 1
+                  referenceable:
+                    id: 72
+                    customerId: 1
+                    customerName: customer 001
+                    customerAddress: null
+                    customerPhone: null
+                    billingAddress: null
+                    billingPhone: null
+                    billingEmail: null
+                    shippingAddress: null
+                    shippingPhone: null
+                    shippingEmail: null
+                    warehouseId: 1
+                    deliveryOrderId: 65
+                    driver: null
+                    licensePlate: null
+                    form:
+                      id: 318
+                      branchId: 1
+                      date: '2021-10-18T10:32:57.000Z'
+                      number: DN21100036
+                      editedNumber: null
+                      notes: null
+                      editedNotes: null
+                      createdBy: 1
+                      updatedBy: 1
+                      done: true
+                      incrementNumber: 36
+                      incrementGroup: 202110
+                      formableId: 72
+                      formableType: SalesDeliveryNote
+                      requestApprovalTo: 1
+                      approvalBy: null
+                      approvalAt: null
+                      approvalReason: null
+                      approvalStatus: 0
+                      requestCancellationTo: null
+                      requestCancellationBy: null
+                      requestCancellationAt: null
+                      requestCancellationReason: null
+                      cancellationApprovalAt: null
+                      cancellationApprovalBy: null
+                      cancellationApprovalReason: null
+                      cancellationStatus: null
+                      createdAt: '2021-10-18T10:33:18.000Z'
+                      updatedAt: '2021-10-19T01:31:17.000Z'
+                      BranchId: 1
+    patch:
+      tags:
+        - sales invoices
+      summary: Update sales invoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                id: 86
+                items:
+                  - salesInvoiceItemId: 103
+                    allocationId: null
+                    discountPercent: 0
+                    discountValue: 0
+                requestApprovalTo: 1
+                dueDate: '2021-10-20T00:00:00.000Z'
+                discountPercent: 0
+                discountValue: 0
+                typeOfTax: non
+                notes: updated example notes
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"669-IoV4VgdQvSl0i7Q6KCMvq137Cc4"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 01:43:46 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 86
+                  dueDate: '2021-10-20T00:00:00.000Z'
+                  discountPercent: '0.000000000000000000000000000000'
+                  discountValue: '0.000000000000000000000000000000'
+                  tax: '0.000000000000000000000000000000'
+                  typeOfTax: non
+                  amount: '90000.000000000000000000000000000000'
+                  remaining: '90000.000000000000000000000000000000'
+                  customerId: 1
+                  customerName: customer 001
+                  customerAddress: ''
+                  customerPhone: ''
+                  referenceableId: 72
+                  referenceableType: SalesDeliveryNote
+                  form:
+                    id: 319
+                    branchId: 1
+                    date: '2021-10-19T01:43:46.000Z'
+                    number: SI2110049
+                    editedNumber: null
+                    notes: updated example notes
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 49
+                    incrementGroup: 202110
+                    formableId: 86
+                    formableType: SalesInvoice
+                    requestApprovalTo: 1
+                    approvalBy: 1
+                    approvalAt: '2021-10-19T01:35:11.000Z'
+                    approvalReason: null
+                    approvalStatus: 0
+                    requestCancellationTo: null
+                    requestCancellationBy: null
+                    requestCancellationAt: null
+                    requestCancellationReason: null
+                    cancellationApprovalAt: null
+                    cancellationApprovalBy: null
+                    cancellationApprovalReason: null
+                    cancellationStatus: null
+                    createdAt: '2021-10-19T01:31:17.000Z'
+                    updatedAt: '2021-10-19T01:43:46.000Z'
+                    BranchId: 1
+                  items:
+                    - id: 103
+                      salesInvoiceId: 86
+                      deliveryNoteId: 72
+                      deliveryNoteItemId: 108
+                      itemId: 3
+                      itemName: Ciki
+                      quantity: '100.000000000000000000000000000000'
+                      price: '900.000000000000000000000000000000'
+                      discountPercent: '0.000000000000000000000000000000'
+                      discountValue: '0.000000000000000000000000000000'
+                      taxable: true
+                      unit: PCS
+                      converter: '1.000000000000000000000000000000'
+                      notes: null
+                      allocationId: null
+                      SalesInvoiceId: 86
+    post:
+      tags:
+        - sales invoices
+      summary: Approve sales invoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: ''
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"861-Idvy53ESl09GMA1BjKOaTDUsoR0"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 01:44:56 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 86
+                  dueDate: '2021-10-20T00:00:00.000Z'
+                  discountPercent: '0.000000000000000000000000000000'
+                  discountValue: '0.000000000000000000000000000000'
+                  tax: '0.000000000000000000000000000000'
+                  typeOfTax: non
+                  amount: '90000.000000000000000000000000000000'
+                  remaining: '90000.000000000000000000000000000000'
+                  customerId: 1
+                  customerName: customer 001
+                  customerAddress: ''
+                  customerPhone: ''
+                  referenceableId: 72
+                  referenceableType: SalesDeliveryNote
+                  items:
+                    - id: 103
+                      salesInvoiceId: 86
+                      deliveryNoteId: 72
+                      deliveryNoteItemId: 108
+                      itemId: 3
+                      itemName: Ciki
+                      quantity: '100.000000000000000000000000000000'
+                      price: '900.000000000000000000000000000000'
+                      discountPercent: '0.000000000000000000000000000000'
+                      discountValue: '0.000000000000000000000000000000'
+                      taxable: true
+                      unit: PCS
+                      converter: '1.000000000000000000000000000000'
+                      notes: null
+                      allocationId: null
+                      SalesInvoiceId: 86
+                      item:
+                        id: 3
+                        chartOfAccountId: 9
+                        code: '098765'
+                        barcode: null
+                        name: Ciki
+                        size: null
+                        color: null
+                        weight: null
+                        notes: null
+                        taxable: true
+                        requireProductionNumber: false
+                        requireExpiryDate: false
+                        stock: '0.000000000000000000000000000000'
+                        stockReminder: '0.000000000000000000000000000000'
+                        unitDefault: 3
+                        unitDefaultPurchase: 3
+                        unitDefaultSales: 3
+                        createdBy: 1
+                        updatedBy: 1
+                        archivedBy: null
+                        archivedAt: null
+                        createdAt: '2021-09-27T11:20:52.000Z'
+                        updatedAt: '2021-10-19T01:44:56.000Z'
+                  form:
+                    id: 319
+                    branchId: 1
+                    date: '2021-10-19T01:43:46.000Z'
+                    number: SI2110049
+                    editedNumber: null
+                    notes: updated example notes
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 49
+                    incrementGroup: 202110
+                    formableId: 86
+                    formableType: SalesInvoice
+                    requestApprovalTo: 1
+                    approvalBy: 1
+                    approvalAt: '2021-10-19T01:44:56.000Z'
+                    approvalReason: null
+                    approvalStatus: 1
+                    requestCancellationTo: null
+                    requestCancellationBy: null
+                    requestCancellationAt: null
+                    requestCancellationReason: null
+                    cancellationApprovalAt: null
+                    cancellationApprovalBy: null
+                    cancellationApprovalReason: null
+                    cancellationStatus: null
+                    createdAt: '2021-10-19T01:31:17.000Z'
+                    updatedAt: '2021-10-19T01:44:56.000Z'
+                    BranchId: 1
+  /v1/sales/invoices/form-references:
+    get:
+      tags:
+        - sales invoices
+      summary: Get all reference forms
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"11f6-nEFdAIlODAgbYFg7I932e40msx8"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 01:29:51 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  - id: 318
+                    branchId: 1
+                    date: '2021-10-18T10:32:57.000Z'
+                    number: DN21100036
+                    editedNumber: null
+                    notes: null
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 36
+                    incrementGroup: 202110
+                    formableId: 72
+                    formableType: SalesDeliveryNote
+                    requestApprovalTo: 1
+                    approvalBy: null
+                    approvalAt: null
+                    approvalReason: null
+                    approvalStatus: 0
+                    requestCancellationTo: null
+                    requestCancellationBy: null
+                    requestCancellationAt: null
+                    requestCancellationReason: null
+                    cancellationApprovalAt: null
+                    cancellationApprovalBy: null
+                    cancellationApprovalReason: null
+                    cancellationStatus: null
+                    createdAt: '2021-10-18T10:33:18.000Z'
+                    updatedAt: '2021-10-18T10:33:18.000Z'
+                    BranchId: 1
+                    salesDeliveryNote:
+                      id: 72
+                      customerId: 1
+                      customerName: customer 001
+                      customerAddress: null
+                      customerPhone: null
+                      billingAddress: null
+                      billingPhone: null
+                      billingEmail: null
+                      shippingAddress: null
+                      shippingPhone: null
+                      shippingEmail: null
+                      warehouseId: 1
+                      deliveryOrderId: 65
+                      driver: null
+                      licensePlate: null
+                      items:
+                        - id: 108
+                          deliveryNoteId: 72
+                          deliveryOrderItemId: 100
+                          itemId: 3
+                          itemName: Ciki
+                          grossWeight: null
+                          tareWeight: null
+                          netWeight: null
+                          quantity: 100
+                          expiryDate: null
+                          productionNumber: null
+                          price: 900
+                          discountPercent: 0
+                          discountValue: 0
+                          taxable: true
+                          unit: PCS
+                          converter: '1.000000000000000000000000000000'
+                          notes: null
+                          allocationId: null
+                          DeliveryNoteId: 72
+                          ItemId: 3
+                          allocation: null
+                          deliveryOrderItem:
+                            id: 100
+                            deliveryOrderId: 65
+                            salesOrderItemId: 109
+                            itemId: 3
+                            itemName: Ciki
+                            quantity: '100.000000000000000000000000000000'
+                            price: '900.000000000000000000000000000000'
+                            discountPercent: '0.000000000000000000000000000000'
+                            discountValue: '0.000000000000000000000000000000'
+                            taxable: true
+                            unit: PCS
+                            converter: '1.000000000000000000000000000000'
+                            allocationId: null
+                            DeliveryOrderId: 65
+                            ItemId: 3
+                            salesOrderItem:
+                              id: 109
+                              salesOrderId: 70
+                              salesQuotationItemId: null
+                              salesContractItemId: null
+                              salesContractGroupItemId: null
+                              itemId: 3
+                              itemName: Ciki
+                              quantity: '100.000000000000000000000000000000'
+                              unit: PCS
+                              converter: '1.000000000000000000000000000000'
+                              price: '900.000000000000000000000000000000'
+                              discountPercent: '0.000000000000000000000000000000'
+                              discountValue: '0.000000000000000000000000000000'
+                              taxable: true
+                              notes: null
+                              allocationId: null
+                      customer:
+                        id: 1
+                        code: null
+                        taxIdentificationNumber: null
+                        name: customer 001
+                        address: null
+                        city: null
+                        state: null
+                        country: null
+                        zipCode: null
+                        latitude: null
+                        longitude: null
+                        phone: null
+                        phoneCc: null
+                        email: silaen.hjr@gmail.com
+                        notes: null
+                        creditLimit: '0.000000000000000000000000000000'
+                        branchId: 1
+                        createdBy: 1
+                        updatedBy: 1
+                        archivedBy: null
+                        pricingGroupId: 1
+                        archivedAt: null
+                        createdAt: '2021-09-15T14:08:56.000Z'
+                        updatedAt: '2021-09-15T14:08:56.000Z'
+                        BranchId: 1
+                      deliveryOrder:
+                        id: 65
+                        customerId: 1
+                        warehouseId: 1
+                        salesOrderId: 70
+                        customerName: customer 001
+                        customerAddress: null
+                        customerPhone: null
+                        billingAddress: null
+                        billingPhone: null
+                        billingEmail: null
+                        shippingAddress: null
+                        shippingPhone: null
+                        shippingEmail: null
+                        salesOrder:
+                          id: 70
+                          salesQuotationId: null
+                          salesContractId: null
+                          customerId: 1
+                          customerName: customer 001
+                          customerAddress: null
+                          customerPhone: null
+                          billingAddress: null
+                          billingPhone: null
+                          billingEmail: null
+                          shippingAddress: null
+                          shippingPhone: null
+                          shippingEmail: null
+                          warehouseId: null
+                          eta: null
+                          cashOnly: false
+                          needDownPayment: '0.000000000000000000000000000000'
+                          deliveryFee: '0.000000000000000000000000000000'
+                          discountPercent: '0.000000000000000000000000000000'
+                          discountValue: '0.000000000000000000000000000000'
+                          typeOfTax: exclude
+                          tax: '9000.000000000000000000000000000000'
+                          amount: '99000.000000000000000000000000000000'
+                          createdAt: null
+                          updatedAt: null
+                          form:
+                            id: 316
+                            branchId: 1
+                            date: '2021-10-18T10:32:03.000Z'
+                            number: SO21100033
+                            editedNumber: null
+                            notes: null
+                            editedNotes: null
+                            createdBy: 1
+                            updatedBy: 1
+                            done: true
+                            incrementNumber: 33
+                            incrementGroup: 202110
+                            formableId: 70
+                            formableType: SalesOrder
+                            requestApprovalTo: 1
+                            approvalBy: 1
+                            approvalAt: '2021-10-18T10:32:29.000Z'
+                            approvalReason: null
+                            approvalStatus: 1
+                            requestCancellationTo: null
+                            requestCancellationBy: null
+                            requestCancellationAt: null
+                            requestCancellationReason: null
+                            cancellationApprovalAt: null
+                            cancellationApprovalBy: null
+                            cancellationApprovalReason: null
+                            cancellationStatus: null
+                            createdAt: '2021-10-18T10:32:26.000Z'
+                            updatedAt: '2021-10-18T10:32:42.000Z'
+                            BranchId: 1
+                    salesVisitation: null
+                meta:
+                  current_page: 1
+                  last_page: 1
+                  per_page: 10
+                  total: 1
+  /v1/sales/invoices/:
+    post:
+      tags:
+        - sales invoices
+      summary: Create sales invoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                formId: 318
+                items:
+                  - itemId: 3
+                    referenceItemId: 108
+                    quantity: 100
+                    itemUnit: PCS
+                    allocationId: null
+                    price: 900
+                    discountPercent: 0
+                    discountValue: 0
+                requestApprovalTo: 1
+                dueDate: '2021-10-20T00:00:00.000Z'
+                discountPercent: 0
+                discountValue: 0
+                customerId: 1
+                typeOfTax: non
+                notes: example notes
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '690'
+            ETag:
+              schema:
+                type: string
+                example: W/"2b2-ysQfogx3tIP3HcGMe+pepNsbCCI"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 01:31:17 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  salesInvoiceForm:
+                    done: false
+                    approvalStatus: 0
+                    id: 319
+                    branchId: 1
+                    date: '2021-10-19T01:31:17.520Z'
+                    number: SI2110049
+                    notes: example notes
+                    createdBy: 1
+                    updatedBy: 1
+                    incrementNumber: 49
+                    incrementGroup: '202110'
+                    formableId: 86
+                    formableType: SalesInvoice
+                    requestApprovalTo: 1
+                    updatedAt: '2021-10-19T01:31:17.520Z'
+                    createdAt: '2021-10-19T01:31:17.520Z'
+                  salesInvoice:
+                    id: 86
+                    dueDate: '2021-10-20T00:00:00.000Z'
+                    discountPercent: 0
+                    discountValue: 0
+                    tax: 0
+                    typeOfTax: non
+                    amount: 90000
+                    remaining: 90000
+                    customerId: 1
+                    customerName: customer 001
+                    customerAddress: ''
+                    customerPhone: ''
+                    referenceableId: 72
+                    referenceableType: SalesDeliveryNote
+  /v1/sales/invoices/86/reject:
+    post:
+      tags:
+        - sales invoices
+      summary: Reject sales invoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                reason: example reject reason
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"4ce-OBO+jSygqIjZIly3fRU6r3yfHLM"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 01:35:11 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  salesInvoice:
+                    id: 86
+                    dueDate: '2021-10-20T00:00:00.000Z'
+                    discountPercent: '0.000000000000000000000000000000'
+                    discountValue: '0.000000000000000000000000000000'
+                    tax: '0.000000000000000000000000000000'
+                    typeOfTax: non
+                    amount: '90000.000000000000000000000000000000'
+                    remaining: '90000.000000000000000000000000000000'
+                    customerId: 1
+                    customerName: customer 001
+                    customerAddress: ''
+                    customerPhone: ''
+                    referenceableId: 72
+                    referenceableType: SalesDeliveryNote
+                    form:
+                      id: 319
+                      branchId: 1
+                      date: '2021-10-19T01:31:17.000Z'
+                      number: SI2110049
+                      editedNumber: null
+                      notes: example notes
+                      editedNotes: null
+                      createdBy: 1
+                      updatedBy: 1
+                      done: false
+                      incrementNumber: 49
+                      incrementGroup: 202110
+                      formableId: 86
+                      formableType: SalesInvoice
+                      requestApprovalTo: 1
+                      approvalBy: 1
+                      approvalAt: '2021-10-19T01:35:11.459Z'
+                      approvalReason: example reject reason
+                      approvalStatus: -1
+                      requestCancellationTo: null
+                      requestCancellationBy: null
+                      requestCancellationAt: null
+                      requestCancellationReason: null
+                      cancellationApprovalAt: null
+                      cancellationApprovalBy: null
+                      cancellationApprovalReason: null
+                      cancellationStatus: null
+                      createdAt: '2021-10-19T01:31:17.000Z'
+                      updatedAt: '2021-10-19T01:35:11.459Z'
+                      BranchId: 1
+  /v1/sales/invoices/86/:
+    delete:
+      tags:
+        - sales invoices
+      summary: Delete sales invoice
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"4d1-t9DLhwjs4t225xAF2gedAMYo+No"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 03:14:46 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 86
+                  dueDate: '2021-10-20T00:00:00.000Z'
+                  discountPercent: '0.000000000000000000000000000000'
+                  discountValue: '0.000000000000000000000000000000'
+                  tax: '0.000000000000000000000000000000'
+                  typeOfTax: non
+                  amount: '90000.000000000000000000000000000000'
+                  remaining: '90000.000000000000000000000000000000'
+                  customerId: 1
+                  customerName: customer 001
+                  customerAddress: ''
+                  customerPhone: ''
+                  referenceableId: 72
+                  referenceableType: SalesDeliveryNote
+                  form:
+                    id: 319
+                    branchId: 1
+                    date: '2021-10-19T01:43:46.000Z'
+                    number: SI2110049
+                    editedNumber: null
+                    notes: updated example notes
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 49
+                    incrementGroup: 202110
+                    formableId: 86
+                    formableType: SalesInvoice
+                    requestApprovalTo: 1
+                    approvalBy: 1
+                    approvalAt: '2021-10-19T01:44:56.000Z'
+                    approvalReason: null
+                    approvalStatus: 1
+                    requestCancellationTo: 1
+                    requestCancellationBy: 1
+                    requestCancellationAt: '2021-10-19T03:14:46.302Z'
+                    requestCancellationReason: example delete reason
+                    cancellationApprovalAt: null
+                    cancellationApprovalBy: null
+                    cancellationApprovalReason: null
+                    cancellationStatus: 0
+                    createdAt: '2021-10-19T01:31:17.000Z'
+                    updatedAt: '2021-10-19T03:14:46.303Z'
+                    BranchId: 1
+  /v1/sales/invoices/86/cancellation-reject:
+    post:
+      tags:
+        - sales invoices
+      summary: Reject delete sales invoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                reason: example reject delete reason
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"4ff-4/KyfDgIr6vOpKEg2lOkTGqWLQc"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 03:16:50 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 86
+                  dueDate: '2021-10-20T00:00:00.000Z'
+                  discountPercent: '0.000000000000000000000000000000'
+                  discountValue: '0.000000000000000000000000000000'
+                  tax: '0.000000000000000000000000000000'
+                  typeOfTax: non
+                  amount: '90000.000000000000000000000000000000'
+                  remaining: '90000.000000000000000000000000000000'
+                  customerId: 1
+                  customerName: customer 001
+                  customerAddress: ''
+                  customerPhone: ''
+                  referenceableId: 72
+                  referenceableType: SalesDeliveryNote
+                  form:
+                    id: 319
+                    branchId: 1
+                    date: '2021-10-19T01:43:46.000Z'
+                    number: SI2110049
+                    editedNumber: null
+                    notes: updated example notes
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 49
+                    incrementGroup: 202110
+                    formableId: 86
+                    formableType: SalesInvoice
+                    requestApprovalTo: 1
+                    approvalBy: 1
+                    approvalAt: '2021-10-19T01:44:56.000Z'
+                    approvalReason: null
+                    approvalStatus: 1
+                    requestCancellationTo: 1
+                    requestCancellationBy: 1
+                    requestCancellationAt: '2021-10-19T03:14:46.000Z'
+                    requestCancellationReason: example delete reason
+                    cancellationApprovalAt: '2021-10-19T03:16:50.372Z'
+                    cancellationApprovalBy: 1
+                    cancellationApprovalReason: example reject delete reason
+                    cancellationStatus: -1
+                    createdAt: '2021-10-19T01:31:17.000Z'
+                    updatedAt: '2021-10-19T03:16:50.372Z'
+                    BranchId: 1
+  /v1/sales/invoices/86/cancellation-approve:
+    post:
+      tags:
+        - sales invoices
+      summary: Approve delete sales invoice
+      requestBody:
+        content: {}
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"6b6-ybe2uGrfYf0PZ9ZELGLZ8PF9ueI"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 03:19:04 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 86
+                  dueDate: '2021-10-20T00:00:00.000Z'
+                  discountPercent: '0.000000000000000000000000000000'
+                  discountValue: '0.000000000000000000000000000000'
+                  tax: '0.000000000000000000000000000000'
+                  typeOfTax: non
+                  amount: '90000.000000000000000000000000000000'
+                  remaining: '90000.000000000000000000000000000000'
+                  customerId: 1
+                  customerName: customer 001
+                  customerAddress: ''
+                  customerPhone: ''
+                  referenceableId: 72
+                  referenceableType: SalesDeliveryNote
+                  form:
+                    id: 319
+                    branchId: 1
+                    date: '2021-10-19T01:43:46.000Z'
+                    number: SI2110049
+                    editedNumber: null
+                    notes: updated example notes
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 49
+                    incrementGroup: 202110
+                    formableId: 86
+                    formableType: SalesInvoice
+                    requestApprovalTo: 1
+                    approvalBy: 1
+                    approvalAt: '2021-10-19T01:44:56.000Z'
+                    approvalReason: null
+                    approvalStatus: 1
+                    requestCancellationTo: 1
+                    requestCancellationBy: 1
+                    requestCancellationAt: '2021-10-19T03:18:07.000Z'
+                    requestCancellationReason: example delete reason
+                    cancellationApprovalAt: '2021-10-19T03:19:04.880Z'
+                    cancellationApprovalBy: 1
+                    cancellationApprovalReason: example reject delete reason
+                    cancellationStatus: 1
+                    createdAt: '2021-10-19T01:31:17.000Z'
+                    updatedAt: '2021-10-19T03:19:04.880Z'
+                    BranchId: 1
+                  items:
+                    - id: 103
+                      salesInvoiceId: 86
+                      deliveryNoteId: 72
+                      deliveryNoteItemId: 108
+                      itemId: 3
+                      itemName: Ciki
+                      quantity: '100.000000000000000000000000000000'
+                      price: '900.000000000000000000000000000000'
+                      discountPercent: '0.000000000000000000000000000000'
+                      discountValue: '0.000000000000000000000000000000'
+                      taxable: true
+                      unit: PCS
+                      converter: '1.000000000000000000000000000000'
+                      notes: null
+                      allocationId: null
+                      SalesInvoiceId: 86
+  /v1/sales/invoices/86/send-invoice:
+    post:
+      tags:
+        - sales invoices
+      summary: Send invoice to customer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: silaen.hjr@gmail.com
+                message: example message
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '51'
+            ETag:
+              schema:
+                type: string
+                example: W/"33-mlcilie/v3Pm1lmCswx0e0YaMME"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 03:21:44 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                message: invoice is queued to send to customer
+  /v1/setting/logo:
+    get:
+      tags:
+        - setting
+      summary: Get current logo
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '323'
+            ETag:
+              schema:
+                type: string
+                example: W/"143-Ytp06A6fmoD5YDdFmvV5i262+Fo"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 03:25:59 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1
+                  path: hendrix/settingLogo/f3bc65ca-cb12-459a-a4e5-33d0fecf3602
+                  publicUrl: >-
+                    https://hendrix-playground.s3.ap-southeast-1.amazonaws.com/hendrix/settingLogo/f3bc65ca-cb12-459a-a4e5-33d0fecf3602.png
+                  createdBy: 1
+                  updatedBy: 1
+                  createdAt: '2021-10-12T07:38:13.000Z'
+                  updatedAt: '2021-10-14T12:05:39.000Z'
+    post:
+      tags:
+        - setting
+      summary: Update logo
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '323'
+            ETag:
+              schema:
+                type: string
+                example: W/"143-ejZv+A4PmS+4YCyZINqjRsdMGhE"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 03:28:08 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1
+                  path: hendrix/settingLogo/142998cf-2802-4a6f-8d56-358fab955d5f
+                  publicUrl: >-
+                    https://hendrix-playground.s3.ap-southeast-1.amazonaws.com/hendrix/settingLogo/142998cf-2802-4a6f-8d56-358fab955d5f.png
+                  createdBy: 1
+                  updatedBy: 1
+                  createdAt: '2021-10-12T07:38:13.000Z'
+                  updatedAt: '2021-10-19T03:28:08.926Z'
+  /v1/setting/end-note:
+    get:
+      tags:
+        - setting
+      summary: Get current end note
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '548'
+            ETag:
+              schema:
+                type: string
+                example: W/"224-uXO0emNR//xZTqdZQbE1q8gvNIo"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 03:30:07 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1
+                  purchaseRequest: pr test
+                  purchaseOrder: ''
+                  purchaseDownPayment: ''
+                  purchaseReceive: ''
+                  purchaseInvoice: ''
+                  purchaseReturn: test
+                  paymentOrderPurchase: ''
+                  pointOfSales: test pos
+                  salesQuotation: ''
+                  salesOrder: ''
+                  salesDownPayment: ''
+                  salesInvoice: notes yang baru
+                  salesReturn: ''
+                  paymentCollectionSales: ''
+                  expeditionOrder: ''
+                  expeditionDownPayment: ''
+                  expeditionInvoice: ''
+                  paymentOrderExpedition: ''
+                  createdBy: 1
+                  updatedBy: 1
+                  createdAt: '2021-10-12T10:30:36.000Z'
+                  updatedAt: '2021-10-14T12:05:54.000Z'
+    post:
+      tags:
+        - setting
+      summary: Update end note
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                purchaseRequest: pr test
+                purchaseOrder: ''
+                purchaseDownPayment: ''
+                purchaseReceive: ''
+                purchaseInvoice: ''
+                purchaseReturn: test
+                paymentOrderPurchase: ''
+                pointOfSales: test pos
+                salesQuotation: ''
+                salesOrder: ''
+                salesDownPayment: ''
+                salesInvoice: notes yang baru
+                salesReturn: ''
+                paymentCollectionSales: ''
+                expeditionOrder: ''
+                expeditionDownPayment: ''
+                expeditionInvoice: ''
+                paymentOrderExpedition: coba aja
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '556'
+            ETag:
+              schema:
+                type: string
+                example: W/"22c-2ZjbQIK4YBlsjaANcy5ROL/tA+Q"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Date:
+              schema:
+                type: string
+                example: Tue, 19 Oct 2021 03:32:05 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1
+                  purchaseRequest: pr test
+                  purchaseOrder: ''
+                  purchaseDownPayment: ''
+                  purchaseReceive: ''
+                  purchaseInvoice: ''
+                  purchaseReturn: test
+                  paymentOrderPurchase: ''
+                  pointOfSales: test pos
+                  salesQuotation: ''
+                  salesOrder: ''
+                  salesDownPayment: ''
+                  salesInvoice: notes yang baru
+                  salesReturn: ''
+                  paymentCollectionSales: ''
+                  expeditionOrder: ''
+                  expeditionDownPayment: ''
+                  expeditionInvoice: ''
+                  paymentOrderExpedition: coba aja
+                  createdBy: 1
+                  updatedBy: 1
+                  createdAt: '2021-10-12T10:30:36.000Z'
+                  updatedAt: '2021-10-19T03:32:05.896Z'
+  /v1/inventory/corrections:
+    get:
+      tags:
+        - stock corrections
+      summary: Get all stock corrections
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"2f70-P+8/f/BTDp1+NslgKuI+GWgGhAI"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Sat, 19 Feb 2022 02:02:56 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  - id: 74
+                    warehouseId: 1
+                    form:
+                      id: 647
+                      branchId: 1
+                      date: '2022-02-18T00:36:18.000Z'
+                      number: SC2202015
+                      editedNumber: null
+                      notes: test
+                      editedNotes: null
+                      createdBy: 1
+                      updatedBy: 1
+                      done: false
+                      incrementNumber: 15
+                      incrementGroup: 202202
+                      formableId: 74
+                      formableType: StockCorrection
+                      requestApprovalTo: 1
+                      approvalBy: null
+                      approvalAt: null
+                      approvalReason: null
+                      approvalStatus: 0
+                      requestCancellationTo: null
+                      requestCancellationBy: null
+                      requestCancellationAt: null
+                      requestCancellationReason: null
+                      cancellationApprovalAt: null
+                      cancellationApprovalBy: null
+                      cancellationApprovalReason: null
+                      cancellationStatus: null
+                      createdAt: '2022-02-18T00:36:18.000Z'
+                      updatedAt: '2022-02-18T00:36:18.000Z'
+                      BranchId: 1
+                      createdByUser:
+                        fullName: Vincenzo Moen
+                        id: 1
+                        name: demodemon
+                        firstName: Vincenzo
+                        lastName: Moen
+                        address: null
+                        phone: null
+                        email: silaen.hjr@gmail.com
+                        branchId: null
+                        createdAt: '2021-09-15T13:40:50.000Z'
+                        updatedAt: '2021-09-15T13:40:50.000Z'
+                      approvalByUser: null
+                    items:
+                      - initialStock: null
+                        quantity: 200
+                        finalStock: null
+                        expiryDate: null
+                        converter: 1
+                        id: 234
+                        stockCorrectionId: 74
+                        itemId: 10
+                        productionNumber: null
+                        unit: PCS
+                        notes: test
+                        allocationId: 1
+                        StockCorrectionId: 74
+                        item:
+                          label: '[COBA002] Aqua'
+                          id: 10
+                          chartOfAccountId: 9
+                          code: COBA002
+                          barcode: null
+                          name: Aqua
+                          size: null
+                          color: null
+                          weight: null
+                          notes: null
+                          taxable: true
+                          requireProductionNumber: false
+                          requireExpiryDate: false
+                          stock: '1942.000000000000000000000000000000'
+                          stockReminder: '0.000000000000000000000000000000'
+                          unitDefault: 13
+                          unitDefaultPurchase: 13
+                          unitDefaultSales: 13
+                          createdBy: 1
+                          updatedBy: 1
+                          archivedBy: null
+                          archivedAt: null
+                          createdAt: '2021-12-03T02:09:59.000Z'
+                          updatedAt: '2022-02-09T23:38:42.000Z'
+                          ChartOfAccountId: 9
+                    warehouse:
+                      id: 1
+                      code: null
+                      name: CENTRAL WAREHOUSE
+                      address: null
+                      phone: null
+                      notes: null
+                      branchId: 1
+                      createdBy: 1
+                      updatedBy: 1
+                      archivedBy: null
+                      archivedAt: null
+                      createdAt: '2021-09-15T13:41:11.000Z'
+                      updatedAt: '2021-09-15T13:41:11.000Z'
+                      BranchId: 1
+                  - id: 73
+                    warehouseId: 1
+                    form:
+                      id: 646
+                      branchId: 1
+                      date: '2022-02-12T10:52:25.000Z'
+                      number: SC2202014
+                      editedNumber: null
+                      notes: test test
+                      editedNotes: null
+                      createdBy: 1
+                      updatedBy: 1
+                      done: false
+                      incrementNumber: 14
+                      incrementGroup: 202202
+                      formableId: 73
+                      formableType: StockCorrection
+                      requestApprovalTo: 1
+                      approvalBy: null
+                      approvalAt: null
+                      approvalReason: null
+                      approvalStatus: 0
+                      requestCancellationTo: null
+                      requestCancellationBy: null
+                      requestCancellationAt: null
+                      requestCancellationReason: null
+                      cancellationApprovalAt: null
+                      cancellationApprovalBy: null
+                      cancellationApprovalReason: null
+                      cancellationStatus: null
+                      createdAt: '2022-02-12T10:47:36.000Z'
+                      updatedAt: '2022-02-12T10:52:25.000Z'
+                      BranchId: 1
+                      createdByUser:
+                        fullName: Vincenzo Moen
+                        id: 1
+                        name: demodemon
+                        firstName: Vincenzo
+                        lastName: Moen
+                        address: null
+                        phone: null
+                        email: silaen.hjr@gmail.com
+                        branchId: null
+                        createdAt: '2021-09-15T13:40:50.000Z'
+                        updatedAt: '2021-09-15T13:40:50.000Z'
+                      approvalByUser: null
+                    items:
+                      - initialStock: null
+                        quantity: 20
+                        finalStock: null
+                        expiryDate: null
+                        converter: 1
+                        id: 228
+                        stockCorrectionId: 73
+                        itemId: 10
+                        productionNumber: null
+                        unit: PCS
+                        notes: test
+                        allocationId: 1
+                        StockCorrectionId: 73
+                        item:
+                          label: '[COBA002] Aqua'
+                          id: 10
+                          chartOfAccountId: 9
+                          code: COBA002
+                          barcode: null
+                          name: Aqua
+                          size: null
+                          color: null
+                          weight: null
+                          notes: null
+                          taxable: true
+                          requireProductionNumber: false
+                          requireExpiryDate: false
+                          stock: '1942.000000000000000000000000000000'
+                          stockReminder: '0.000000000000000000000000000000'
+                          unitDefault: 13
+                          unitDefaultPurchase: 13
+                          unitDefaultSales: 13
+                          createdBy: 1
+                          updatedBy: 1
+                          archivedBy: null
+                          archivedAt: null
+                          createdAt: '2021-12-03T02:09:59.000Z'
+                          updatedAt: '2022-02-09T23:38:42.000Z'
+                          ChartOfAccountId: 9
+                      - initialStock: null
+                        quantity: 1
+                        finalStock: null
+                        expiryDate: null
+                        converter: 1
+                        id: 229
+                        stockCorrectionId: 73
+                        itemId: 11
+                        productionNumber: KJOY001
+                        unit: PCS
+                        notes: test 1
+                        allocationId: 1
+                        StockCorrectionId: 73
+                        item:
+                          label: '[KJOY] Kinder Joy'
+                          id: 11
+                          chartOfAccountId: 9
+                          code: KJOY
+                          barcode: null
+                          name: Kinder Joy
+                          size: null
+                          color: null
+                          weight: null
+                          notes: null
+                          taxable: true
+                          requireProductionNumber: true
+                          requireExpiryDate: false
+                          stock: '10100.000000000000000000000000000000'
+                          stockReminder: '0.000000000000000000000000000000'
+                          unitDefault: 15
+                          unitDefaultPurchase: 15
+                          unitDefaultSales: 15
+                          createdBy: 1
+                          updatedBy: 1
+                          archivedBy: null
+                          archivedAt: null
+                          createdAt: '2022-02-12T09:10:29.000Z'
+                          updatedAt: '2022-02-12T09:16:20.000Z'
+                          ChartOfAccountId: 9
+                      - initialStock: null
+                        quantity: 2
+                        finalStock: null
+                        expiryDate: null
+                        converter: 1
+                        id: 230
+                        stockCorrectionId: 73
+                        itemId: 11
+                        productionNumber: KJOY002
+                        unit: PCS
+                        notes: test 1
+                        allocationId: 1
+                        StockCorrectionId: 73
+                        item:
+                          label: '[KJOY] Kinder Joy'
+                          id: 11
+                          chartOfAccountId: 9
+                          code: KJOY
+                          barcode: null
+                          name: Kinder Joy
+                          size: null
+                          color: null
+                          weight: null
+                          notes: null
+                          taxable: true
+                          requireProductionNumber: true
+                          requireExpiryDate: false
+                          stock: '10100.000000000000000000000000000000'
+                          stockReminder: '0.000000000000000000000000000000'
+                          unitDefault: 15
+                          unitDefaultPurchase: 15
+                          unitDefaultSales: 15
+                          createdBy: 1
+                          updatedBy: 1
+                          archivedBy: null
+                          archivedAt: null
+                          createdAt: '2022-02-12T09:10:29.000Z'
+                          updatedAt: '2022-02-12T09:16:20.000Z'
+                          ChartOfAccountId: 9
+                      - initialStock: null
+                        quantity: 3
+                        finalStock: null
+                        expiryDate: null
+                        converter: 1
+                        id: 231
+                        stockCorrectionId: 73
+                        itemId: 11
+                        productionNumber: KJOY003
+                        unit: PCS
+                        notes: test 1
+                        allocationId: 1
+                        StockCorrectionId: 73
+                        item:
+                          label: '[KJOY] Kinder Joy'
+                          id: 11
+                          chartOfAccountId: 9
+                          code: KJOY
+                          barcode: null
+                          name: Kinder Joy
+                          size: null
+                          color: null
+                          weight: null
+                          notes: null
+                          taxable: true
+                          requireProductionNumber: true
+                          requireExpiryDate: false
+                          stock: '10100.000000000000000000000000000000'
+                          stockReminder: '0.000000000000000000000000000000'
+                          unitDefault: 15
+                          unitDefaultPurchase: 15
+                          unitDefaultSales: 15
+                          createdBy: 1
+                          updatedBy: 1
+                          archivedBy: null
+                          archivedAt: null
+                          createdAt: '2022-02-12T09:10:29.000Z'
+                          updatedAt: '2022-02-12T09:16:20.000Z'
+                          ChartOfAccountId: 9
+                      - initialStock: null
+                        quantity: 4
+                        finalStock: null
+                        expiryDate: null
+                        converter: 1
+                        id: 232
+                        stockCorrectionId: 73
+                        itemId: 11
+                        productionNumber: KJOY004
+                        unit: PCS
+                        notes: test 1
+                        allocationId: 1
+                        StockCorrectionId: 73
+                        item:
+                          label: '[KJOY] Kinder Joy'
+                          id: 11
+                          chartOfAccountId: 9
+                          code: KJOY
+                          barcode: null
+                          name: Kinder Joy
+                          size: null
+                          color: null
+                          weight: null
+                          notes: null
+                          taxable: true
+                          requireProductionNumber: true
+                          requireExpiryDate: false
+                          stock: '10100.000000000000000000000000000000'
+                          stockReminder: '0.000000000000000000000000000000'
+                          unitDefault: 15
+                          unitDefaultPurchase: 15
+                          unitDefaultSales: 15
+                          createdBy: 1
+                          updatedBy: 1
+                          archivedBy: null
+                          archivedAt: null
+                          createdAt: '2022-02-12T09:10:29.000Z'
+                          updatedAt: '2022-02-12T09:16:20.000Z'
+                          ChartOfAccountId: 9
+                      - initialStock: null
+                        quantity: 5
+                        finalStock: null
+                        expiryDate: null
+                        converter: 1
+                        id: 233
+                        stockCorrectionId: 73
+                        itemId: 11
+                        productionNumber: KJOY005
+                        unit: PCS
+                        notes: test 1
+                        allocationId: 1
+                        StockCorrectionId: 73
+                        item:
+                          label: '[KJOY] Kinder Joy'
+                          id: 11
+                          chartOfAccountId: 9
+                          code: KJOY
+                          barcode: null
+                          name: Kinder Joy
+                          size: null
+                          color: null
+                          weight: null
+                          notes: null
+                          taxable: true
+                          requireProductionNumber: true
+                          requireExpiryDate: false
+                          stock: '10100.000000000000000000000000000000'
+                          stockReminder: '0.000000000000000000000000000000'
+                          unitDefault: 15
+                          unitDefaultPurchase: 15
+                          unitDefaultSales: 15
+                          createdBy: 1
+                          updatedBy: 1
+                          archivedBy: null
+                          archivedAt: null
+                          createdAt: '2022-02-12T09:10:29.000Z'
+                          updatedAt: '2022-02-12T09:16:20.000Z'
+                          ChartOfAccountId: 9
+                    warehouse:
+                      id: 1
+                      code: null
+                      name: CENTRAL WAREHOUSE
+                      address: null
+                      phone: null
+                      notes: null
+                      branchId: 1
+                      createdBy: 1
+                      updatedBy: 1
+                      archivedBy: null
+                      archivedAt: null
+                      createdAt: '2021-09-15T13:41:11.000Z'
+                      updatedAt: '2021-09-15T13:41:11.000Z'
+                      BranchId: 1
+                  - id: 72
+                    warehouseId: 1
+                    form:
+                      id: 645
+                      branchId: 1
+                      date: '2022-02-12T10:35:07.000Z'
+                      number: SC2202013
+                      editedNumber: null
+                      notes: test
+                      editedNotes: null
+                      createdBy: 1
+                      updatedBy: 1
+                      done: false
+                      incrementNumber: 13
+                      incrementGroup: 202202
+                      formableId: 72
+                      formableType: StockCorrection
+                      requestApprovalTo: 1
+                      approvalBy: 1
+                      approvalAt: '2022-02-12T10:35:27.000Z'
+                      approvalReason: null
+                      approvalStatus: 1
+                      requestCancellationTo: null
+                      requestCancellationBy: null
+                      requestCancellationAt: null
+                      requestCancellationReason: null
+                      cancellationApprovalAt: null
+                      cancellationApprovalBy: null
+                      cancellationApprovalReason: null
+                      cancellationStatus: null
+                      createdAt: '2022-02-12T10:34:21.000Z'
+                      updatedAt: '2022-02-12T10:35:27.000Z'
+                      BranchId: 1
+                      createdByUser:
+                        fullName: Vincenzo Moen
+                        id: 1
+                        name: demodemon
+                        firstName: Vincenzo
+                        lastName: Moen
+                        address: null
+                        phone: null
+                        email: silaen.hjr@gmail.com
+                        branchId: null
+                        createdAt: '2021-09-15T13:40:50.000Z'
+                        updatedAt: '2021-09-15T13:40:50.000Z'
+                      approvalByUser:
+                        fullName: Vincenzo Moen
+                        id: 1
+                        name: demodemon
+                        firstName: Vincenzo
+                        lastName: Moen
+                        address: null
+                        phone: null
+                        email: silaen.hjr@gmail.com
+                        branchId: null
+                        createdAt: '2021-09-15T13:40:50.000Z'
+                        updatedAt: '2021-09-15T13:40:50.000Z'
+                    items:
+                      - initialStock: 18704
+                        quantity: 3
+                        finalStock: 18707
+                        expiryDate: '2023-09-01 07:00:00'
+                        converter: 1
+                        id: 218
+                        stockCorrectionId: 72
+                        itemId: 4
+                        productionNumber: '001'
+                        unit: PCS
+                        notes: tset
+                        allocationId: 1
+                        StockCorrectionId: 72
+                        item:
+                          label: '[PRO001] Beng Beng'
+                          id: 4
+                          chartOfAccountId: 9
+                          code: PRO001
+                          barcode: null
+                          name: Beng Beng
+                          size: null
+                          color: null
+                          weight: null
+                          notes: null
+                          taxable: true
+                          requireProductionNumber: true
+                          requireExpiryDate: true
+                          stock: '990.000000000000000000000000000000'
+                          stockReminder: '0.000000000000000000000000000000'
+                          unitDefault: 4
+                          unitDefaultPurchase: 4
+                          unitDefaultSales: 4
+                          createdBy: 1
+                          updatedBy: 1
+                          archivedBy: null
+                          archivedAt: null
+                          createdAt: '2021-09-30T11:14:27.000Z'
+                          updatedAt: '2022-02-09T23:38:42.000Z'
+                          ChartOfAccountId: 9
+                      - initialStock: 615
+                        quantity: 6
+                        finalStock: 621
+                        expiryDate: '2024-12-31 00:00:00'
+                        converter: 1
+                        id: 219
+                        stockCorrectionId: 72
+                        itemId: 4
+                        productionNumber: '004'
+                        unit: PCS
+                        notes: tset
+                        allocationId: 1
+                        StockCorrectionId: 72
+                        item:
+                          label: '[PRO001] Beng Beng'
+                          id: 4
+                          chartOfAccountId: 9
+                          code: PRO001
+                          barcode: null
+                          name: Beng Beng
+                          size: null
+                          color: null
+                          weight: null
+                          notes: null
+                          taxable: true
+                          requireProductionNumber: true
+                          requireExpiryDate: true
+                          stock: '990.000000000000000000000000000000'
+                          stockReminder: '0.000000000000000000000000000000'
+                          unitDefault: 4
+                          unitDefaultPurchase: 4
+                          unitDefaultSales: 4
+                          createdBy: 1
+                          updatedBy: 1
+                          archivedBy: null
+                          archivedAt: null
+                          createdAt: '2021-09-30T11:14:27.000Z'
+                          updatedAt: '2022-02-09T23:38:42.000Z'
+                          ChartOfAccountId: 9
+                      - initialStock: 217
+                        quantity: 4
+                        finalStock: 221
+                        expiryDate: '2022-12-31 00:00:00'
+                        converter: 1
+                        id: 220
+                        stockCorrectionId: 72
+                        itemId: 4
+                        productionNumber: '002'
+                        unit: PCS
+                        notes: tset
+                        allocationId: 1
+                        StockCorrectionId: 72
+                        item:
+                          label: '[PRO001] Beng Beng'
+                          id: 4
+                          chartOfAccountId: 9
+                          code: PRO001
+                          barcode: null
+                          name: Beng Beng
+                          size: null
+                          color: null
+                          weight: null
+                          notes: null
+                          taxable: true
+                          requireProductionNumber: true
+                          requireExpiryDate: true
+                          stock: '990.000000000000000000000000000000'
+                          stockReminder: '0.000000000000000000000000000000'
+                          unitDefault: 4
+                          unitDefaultPurchase: 4
+                          unitDefaultSales: 4
+                          createdBy: 1
+                          updatedBy: 1
+                          archivedBy: null
+                          archivedAt: null
+                          createdAt: '2021-09-30T11:14:27.000Z'
+                          updatedAt: '2022-02-09T23:38:42.000Z'
+                          ChartOfAccountId: 9
+                    warehouse:
+                      id: 1
+                      code: null
+                      name: CENTRAL WAREHOUSE
+                      address: null
+                      phone: null
+                      notes: null
+                      branchId: 1
+                      createdBy: 1
+                      updatedBy: 1
+                      archivedBy: null
+                      archivedAt: null
+                      createdAt: '2021-09-15T13:41:11.000Z'
+                      updatedAt: '2021-09-15T13:41:11.000Z'
+                      BranchId: 1
+                meta:
+                  current_page: 1
+                  last_page: 7
+                  per_page: 10
+                  total: 62
+  /v1/inventory/corrections/74:
+    get:
+      tags:
+        - stock corrections
+      summary: Get one stock correction
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"ba9-tHV9kLb7PBHpnd7Q54WrRiwqXtA"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Sat, 19 Feb 2022 02:04:30 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 74
+                  warehouseId: 1
+                  form:
+                    id: 647
+                    branchId: 1
+                    date: '2022-02-18T00:36:18.000Z'
+                    number: SC2202015
+                    editedNumber: null
+                    notes: test
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 15
+                    incrementGroup: 202202
+                    formableId: 74
+                    formableType: StockCorrection
+                    requestApprovalTo: 1
+                    approvalBy: null
+                    approvalAt: null
+                    approvalReason: null
+                    approvalStatus: 0
+                    requestCancellationTo: null
+                    requestCancellationBy: null
+                    requestCancellationAt: null
+                    requestCancellationReason: null
+                    cancellationApprovalAt: null
+                    cancellationApprovalBy: null
+                    cancellationApprovalReason: null
+                    cancellationStatus: null
+                    createdAt: '2022-02-18T00:36:18.000Z'
+                    updatedAt: '2022-02-18T00:36:18.000Z'
+                    BranchId: 1
+                    createdByUser:
+                      fullName: Vincenzo Moen
+                      id: 1
+                      name: demodemon
+                      firstName: Vincenzo
+                      lastName: Moen
+                      address: null
+                      phone: null
+                      email: silaen.hjr@gmail.com
+                      branchId: null
+                      createdAt: '2021-09-15T13:40:50.000Z'
+                      updatedAt: '2021-09-15T13:40:50.000Z'
+                    requestApprovalToUser:
+                      fullName: Vincenzo Moen
+                      id: 1
+                      name: demodemon
+                      firstName: Vincenzo
+                      lastName: Moen
+                      address: null
+                      phone: null
+                      email: silaen.hjr@gmail.com
+                      branchId: null
+                      createdAt: '2021-09-15T13:40:50.000Z'
+                      updatedAt: '2021-09-15T13:40:50.000Z'
+                  warehouse:
+                    id: 1
+                    code: null
+                    name: CENTRAL WAREHOUSE
+                    address: null
+                    phone: null
+                    notes: null
+                    branchId: 1
+                    createdBy: 1
+                    updatedBy: 1
+                    archivedBy: null
+                    archivedAt: null
+                    createdAt: '2021-09-15T13:41:11.000Z'
+                    updatedAt: '2021-09-15T13:41:11.000Z'
+                    BranchId: 1
+                  items:
+                    - initialStock: 1942
+                      quantity: 200
+                      finalStock: 2142
+                      expiryDate: null
+                      converter: 1
+                      id: 234
+                      stockCorrectionId: 74
+                      itemId: 10
+                      productionNumber: null
+                      unit: PCS
+                      notes: test
+                      allocationId: 1
+                      StockCorrectionId: 74
+                      item:
+                        label: '[COBA002] Aqua'
+                        id: 10
+                        chartOfAccountId: 9
+                        code: COBA002
+                        barcode: null
+                        name: Aqua
+                        size: null
+                        color: null
+                        weight: null
+                        notes: null
+                        taxable: true
+                        requireProductionNumber: false
+                        requireExpiryDate: false
+                        stock: '1942.000000000000000000000000000000'
+                        stockReminder: '0.000000000000000000000000000000'
+                        unitDefault: 13
+                        unitDefaultPurchase: 13
+                        unitDefaultSales: 13
+                        createdBy: 1
+                        updatedBy: 1
+                        archivedBy: null
+                        archivedAt: null
+                        createdAt: '2021-12-03T02:09:59.000Z'
+                        updatedAt: '2022-02-09T23:38:42.000Z'
+                        ChartOfAccountId: 9
+                        units:
+                          - converter: 1
+                            id: 13
+                            label: PCS
+                            name: PCS
+                            disabled: false
+                            itemId: 10
+                            createdBy: 1
+                            updatedBy: 1
+                            createdAt: '2021-12-03T02:10:00.000Z'
+                            updatedAt: '2021-12-03T02:10:00.000Z'
+                            ItemId: 10
+                          - converter: 24
+                            id: 14
+                            label: Karto
+                            name: Karton
+                            disabled: false
+                            itemId: 10
+                            createdBy: 1
+                            updatedBy: 1
+                            createdAt: '2021-12-03T02:10:00.000Z'
+                            updatedAt: '2021-12-03T02:10:00.000Z'
+                            ItemId: 10
+                      allocation:
+                        id: 1
+                        code: null
+                        name: bahan
+                        notes: null
+                        branchId: null
+                        createdBy: 1
+                        updatedBy: 1
+                        archivedBy: null
+                        archivedAt: null
+                        createdAt: '2021-09-15T14:10:29.000Z'
+                        updatedAt: '2021-09-15T14:10:29.000Z'
+                        BranchId: null
+  /v1/inventory/corrections/76:
+    post:
+      tags:
+        - stock corrections
+      summary: Create stock correction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                items:
+                  - itemId: 10
+                    unit: PCS
+                    converter: 1
+                    stockCorrection: '100'
+                    notes: ini note
+                    expiryDate: null
+                    productionNumber: null
+                    allocationId: 1
+                dueDate: '2022-02-19T04:33:28.000Z'
+                notes: ini note
+                requestApprovalTo: 1
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"4f4-yi+JUTaJ9G8rrmfVcPcuV8Qk6pA"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Sun, 20 Feb 2022 00:24:20 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 76
+                  warehouseId: 1
+                  form:
+                    id: 649
+                    branchId: 1
+                    date: '2022-02-20T00:24:20.000Z'
+                    number: SC2202017
+                    editedNumber: null
+                    notes: ini note
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 17
+                    incrementGroup: 202202
+                    formableId: 76
+                    formableType: StockCorrection
+                    requestApprovalTo: 1
+                    approvalBy: 1
+                    approvalAt: '2022-02-20T00:17:00.000Z'
+                    approvalReason: null
+                    approvalStatus: 0
+                    requestCancellationTo: null
+                    requestCancellationBy: null
+                    requestCancellationAt: null
+                    requestCancellationReason: null
+                    cancellationApprovalAt: null
+                    cancellationApprovalBy: null
+                    cancellationApprovalReason: null
+                    cancellationStatus: null
+                    createdAt: '2022-02-19T04:33:28.000Z'
+                    updatedAt: '2022-02-20T00:24:20.000Z'
+                    BranchId: 1
+                  items:
+                    - initialStock: null
+                      quantity: 100
+                      finalStock: null
+                      expiryDate: null
+                      converter: 1
+                      id: 238
+                      stockCorrectionId: 76
+                      itemId: 10
+                      productionNumber: null
+                      unit: PCS
+                      notes: ini note
+                      allocationId: 1
+                      StockCorrectionId: 76
+                  warehouse:
+                    id: 1
+                    code: null
+                    name: CENTRAL WAREHOUSE
+                    address: null
+                    phone: null
+                    notes: null
+                    branchId: 1
+                    createdBy: 1
+                    updatedBy: 1
+                    archivedBy: null
+                    archivedAt: null
+                    createdAt: '2021-09-15T13:41:11.000Z'
+                    updatedAt: '2021-09-15T13:41:11.000Z'
+                    BranchId: 1
+    patch:
+      tags:
+        - stock corrections
+      summary: Update stock correction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                items:
+                  - itemId: 10
+                    unit: PCS
+                    converter: 1
+                    stockCorrection: '100'
+                    notes: ini note
+                    expiryDate: null
+                    productionNumber: null
+                    allocationId: 1
+                dueDate: '2022-02-20T00:24:20.000Z'
+                notes: ini note
+                requestApprovalTo: 1
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '430'
+            ETag:
+              schema:
+                type: string
+                example: W/"1ae-tOh6+8YS/r4dc5S+UlhS43+ptJM"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Date:
+              schema:
+                type: string
+                example: Sat, 19 Feb 2022 04:33:28 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  stockCorrection:
+                    id: 76
+                    warehouseId: 1
+                  stockCorrectionForm:
+                    done: false
+                    approvalStatus: 0
+                    id: 649
+                    branchId: 1
+                    date: '2022-02-19T04:33:28.541Z'
+                    number: SC2202017
+                    notes: ini note
+                    createdBy: 1
+                    updatedBy: 1
+                    incrementNumber: 17
+                    incrementGroup: '202202'
+                    formableId: 76
+                    formableType: StockCorrection
+                    requestApprovalTo: 1
+                    updatedAt: '2022-02-19T04:33:28.542Z'
+                    createdAt: '2022-02-19T04:33:28.542Z'
+    delete:
+      tags:
+        - stock corrections
+      summary: Delete stock correction
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '799'
+            ETag:
+              schema:
+                type: string
+                example: W/"31f-1u0ryusJ9zBci4gmcr56s0+91Ks"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Date:
+              schema:
+                type: string
+                example: Sun, 20 Feb 2022 00:43:02 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 76
+                  warehouseId: 1
+                  form:
+                    id: 649
+                    branchId: 1
+                    date: '2022-02-20T00:40:27.000Z'
+                    number: SC2202017
+                    editedNumber: null
+                    notes: ini note
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 17
+                    incrementGroup: 202202
+                    formableId: 76
+                    formableType: StockCorrection
+                    requestApprovalTo: 1
+                    approvalBy: 1
+                    approvalAt: '2022-02-20T00:40:42.000Z'
+                    approvalReason: test
+                    approvalStatus: -1
+                    requestCancellationTo: 1
+                    requestCancellationBy: 1
+                    requestCancellationAt: '2022-02-20T00:43:02.864Z'
+                    requestCancellationReason: test
+                    cancellationApprovalAt: '2022-02-20T00:42:50.000Z'
+                    cancellationApprovalBy: 1
+                    cancellationApprovalReason: null
+                    cancellationStatus: 0
+                    createdAt: '2022-02-19T04:33:28.000Z'
+                    updatedAt: '2022-02-20T00:43:02.864Z'
+                    BranchId: 1
+  /v1/inventory/corrections/76/approve:
+    post:
+      tags:
+        - stock corrections
+      summary: Approve stock correction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                reason: test
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"5fc-JiiJ1/AOIUyPmfWn5UA4HHG+ykw"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Sun, 20 Feb 2022 00:30:55 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 76
+                  warehouseId: 1
+                  items:
+                    - initialStock: 1942
+                      quantity: 100
+                      finalStock: 2042
+                      expiryDate: null
+                      converter: 1
+                      id: 240
+                      stockCorrectionId: 76
+                      itemId: 10
+                      productionNumber: null
+                      unit: PCS
+                      notes: ini note
+                      allocationId: 1
+                      StockCorrectionId: 76
+                      item:
+                        id: 10
+                        chartOfAccountId: 9
+                        code: COBA002
+                        barcode: null
+                        name: Aqua
+                        size: null
+                        color: null
+                        weight: null
+                        notes: null
+                        taxable: true
+                        requireProductionNumber: false
+                        requireExpiryDate: false
+                        stock: '1942.000000000000000000000000000000'
+                        stockReminder: '0.000000000000000000000000000000'
+                        unitDefault: 13
+                        unitDefaultPurchase: 13
+                        unitDefaultSales: 13
+                        createdBy: 1
+                        updatedBy: 1
+                        archivedBy: null
+                        archivedAt: null
+                        createdAt: '2021-12-03T02:09:59.000Z'
+                        updatedAt: '2022-02-09T23:38:42.000Z'
+                        ChartOfAccountId: 9
+                  form:
+                    id: 649
+                    branchId: 1
+                    date: '2022-02-20T00:30:22.000Z'
+                    number: SC2202017
+                    editedNumber: null
+                    notes: ini note
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 17
+                    incrementGroup: 202202
+                    formableId: 76
+                    formableType: StockCorrection
+                    requestApprovalTo: 1
+                    approvalBy: 1
+                    approvalAt: '2022-02-20T00:30:55.000Z'
+                    approvalReason: null
+                    approvalStatus: 1
+                    requestCancellationTo: null
+                    requestCancellationBy: null
+                    requestCancellationAt: null
+                    requestCancellationReason: null
+                    cancellationApprovalAt: null
+                    cancellationApprovalBy: null
+                    cancellationApprovalReason: null
+                    cancellationStatus: null
+                    createdAt: '2022-02-19T04:33:28.000Z'
+                    updatedAt: '2022-02-20T00:30:55.000Z'
+                    BranchId: 1
+  /v1/inventory/corrections/76/reject:
+    post:
+      tags:
+        - stock corrections
+      summary: Reject stock correction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                reason: test
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '785'
+            ETag:
+              schema:
+                type: string
+                example: W/"311-9GIussBwsZU+m7RLL3tP6VgyzgY"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Date:
+              schema:
+                type: string
+                example: Sun, 20 Feb 2022 00:27:48 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  stockCorrection:
+                    id: 76
+                    warehouseId: 1
+                    form:
+                      id: 649
+                      branchId: 1
+                      date: '2022-02-20T00:24:20.000Z'
+                      number: SC2202017
+                      editedNumber: null
+                      notes: ini note
+                      editedNotes: null
+                      createdBy: 1
+                      updatedBy: 1
+                      done: false
+                      incrementNumber: 17
+                      incrementGroup: 202202
+                      formableId: 76
+                      formableType: StockCorrection
+                      requestApprovalTo: 1
+                      approvalBy: 1
+                      approvalAt: '2022-02-20T00:25:57.000Z'
+                      approvalReason: test
+                      approvalStatus: -1
+                      requestCancellationTo: null
+                      requestCancellationBy: null
+                      requestCancellationAt: null
+                      requestCancellationReason: null
+                      cancellationApprovalAt: null
+                      cancellationApprovalBy: null
+                      cancellationApprovalReason: null
+                      cancellationStatus: null
+                      createdAt: '2022-02-19T04:33:28.000Z'
+                      updatedAt: '2022-02-20T00:25:57.000Z'
+                      BranchId: 1
+  /v1/inventory/corrections/76/cancellation-reject:
+    post:
+      tags:
+        - stock corrections
+      summary: Reject delete stock correction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                reason: test
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+                example: '802'
+            ETag:
+              schema:
+                type: string
+                example: W/"322-3psrAtYRcignJuq6Z71G/z4zc+M"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Date:
+              schema:
+                type: string
+                example: Sun, 20 Feb 2022 00:44:50 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 76
+                  warehouseId: 1
+                  form:
+                    id: 649
+                    branchId: 1
+                    date: '2022-02-20T00:40:27.000Z'
+                    number: SC2202017
+                    editedNumber: null
+                    notes: ini note
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 17
+                    incrementGroup: 202202
+                    formableId: 76
+                    formableType: StockCorrection
+                    requestApprovalTo: 1
+                    approvalBy: 1
+                    approvalAt: '2022-02-20T00:40:42.000Z'
+                    approvalReason: test
+                    approvalStatus: -1
+                    requestCancellationTo: 1
+                    requestCancellationBy: 1
+                    requestCancellationAt: '2022-02-20T00:44:46.000Z'
+                    requestCancellationReason: test
+                    cancellationApprovalAt: '2022-02-20T00:44:50.806Z'
+                    cancellationApprovalBy: 1
+                    cancellationApprovalReason: test
+                    cancellationStatus: -1
+                    createdAt: '2022-02-19T04:33:28.000Z'
+                    updatedAt: '2022-02-20T00:44:50.806Z'
+                    BranchId: 1
+  /v1/inventory/corrections/76/cancellation-approve:
+    post:
+      tags:
+        - stock corrections
+      summary: Approve delete stock correction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                reason: test
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: '{{authToken}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: >-
+                  default-src 'self';base-uri
+                  'self';block-all-mixed-content;font-src 'self' https:
+                  data:;frame-ancestors 'self';img-src 'self' data:;object-src
+                  'none';script-src 'self';script-src-attr 'none';style-src
+                  'self' https: 'unsafe-inline';upgrade-insecure-requests
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            Expect-CT:
+              schema:
+                type: string
+                example: max-age=0
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Permitted-Cross-Domain-Policies:
+              schema:
+                type: string
+                example: none
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            X-XSS-Protection:
+              schema:
+                type: integer
+                example: '0'
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: '*'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            ETag:
+              schema:
+                type: string
+                example: W/"40e-vTdVwYWmixldz0ZNRn4yrboOgPY"
+            Vary:
+              schema:
+                type: string
+                example: Accept-Encoding
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Date:
+              schema:
+                type: string
+                example: Sun, 20 Feb 2022 00:47:18 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Keep-Alive:
+              schema:
+                type: string
+                example: timeout=5
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 76
+                  warehouseId: 1
+                  form:
+                    id: 649
+                    branchId: 1
+                    date: '2022-02-20T00:45:28.000Z'
+                    number: SC2202017
+                    editedNumber: null
+                    notes: ini note
+                    editedNotes: null
+                    createdBy: 1
+                    updatedBy: 1
+                    done: false
+                    incrementNumber: 17
+                    incrementGroup: 202202
+                    formableId: 76
+                    formableType: StockCorrection
+                    requestApprovalTo: 1
+                    approvalBy: 1
+                    approvalAt: '2022-02-20T00:45:40.000Z'
+                    approvalReason: test
+                    approvalStatus: -1
+                    requestCancellationTo: 1
+                    requestCancellationBy: 1
+                    requestCancellationAt: '2022-02-20T00:47:03.000Z'
+                    requestCancellationReason: test
+                    cancellationApprovalAt: '2022-02-20T00:47:18.232Z'
+                    cancellationApprovalBy: 1
+                    cancellationApprovalReason: test
+                    cancellationStatus: 1
+                    createdAt: '2022-02-19T04:33:28.000Z'
+                    updatedAt: '2022-02-20T00:47:18.232Z'
+                    BranchId: 1
+                  items:
+                    - initialStock: null
+                      quantity: 100
+                      finalStock: null
+                      expiryDate: null
+                      converter: 1
+                      id: 243
+                      stockCorrectionId: 76
+                      itemId: 10
+                      productionNumber: null
+                      unit: PCS
+                      notes: ini note
+                      allocationId: 1
+                      StockCorrectionId: 76
+  /v1/status:
+    get:
+      tags:
+        - General
+      summary: Get app status
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /v1/auth/get-token:
+    post:
+      tags:
+        - General
+      summary: Get token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                accessToken: >-
+                  eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzMyIsImp0aSI6ImQzOGQ4NGQxOWM2MDI3NTcyMmZmNDJmMzA1Njk1MDFmYWY2NWQ3ZjFlYjQxNzY3ODllMzUwM2NjNWZlMjc3ZDBjM2Y1NGY4MWIxMTQ2NDc1IiwiaWF0IjoxNjM0NTUwNDI0LCJuYmYiOjE2MzQ1NTA0MjQsImV4cCI6MTY2NjA4NjQyNCwic3ViIjoiMSIsInNjb3BlcyI6W119.nkncqh5dFYkx0vdJcLixn7vJ0dSbYEGXi_xkuODCnenKss3sgpv9rt5y-UzJC2YJRULggc2xhsR5drE7N53k92fdd46u4kIihEJIDTjwyzejzQebXfZr5D9IEHOOmnwgdk5SyuzqugSEzNlhZSK769_eWlA29FvHpMu1_VV9U6yPwtMGcSoYdmzOPzuT8eAE-GTAPMeX2ls6He_vhmvMq3D9DH5u9iyeEV5i4owtASI2k_uh9gBe0xMzeNkTAKyUdTPfKllmWjwsf8p2jqJUL-0eCx2xoIYYKbMmxWyI_x_X9lAgicXCpwDWf7qNdEPV0-WHTBfrwiiRZJEcIa8rLjbadrk3YUShV6Op1bUfGIzjGX2_nrQsRsq3FmoTibn_nMPxua-LqFLiceP0qwWhkHy-OSL-oxNmPkXhPfSGwhAQHr1RDk68RQ0218F_uF7ljHx5OGTPnkC04C8W0BI1qMZIa9LOHLsG47QM6DLz6yt8fCZW6vwRNOYmvDX6sGsrFx5QfDyJkEz9UxBMqX-cydZFyEUF6Eh0p7Oaaz-SZQ4tfnpB5p0H-msMKEyJAQ1EaWCy9YHHST8abXkNbe7YJxcgBchNT7kKlsbVty8oeJt9IKaXCaKPQJe95D9qyZq5d1TXc8hO6kWh0fpxWy9r-OcpeNdPftz4sr_An1DEFOc
+                email: carlo25@example.com
+                id: 1
+      parameters:
+        - name: Tenant
+          in: header
+          schema:
+            type: string
+          example: hendrix
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
